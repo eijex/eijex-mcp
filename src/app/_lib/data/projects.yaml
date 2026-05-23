@@ -1,0 +1,49 @@
+projects:
+  - id: mcp-server
+    name: mcp-server
+    path: C:\Work\instructions-library
+    description: Private MCP Server & AI Workflow Hub
+    status: ACTIVE
+    health: 100%
+    report_prefix: mcp-server
+    reporting_config_path: _reporting.yml
+  - id: brainsim
+    name: BrainSim
+    path: C:\Work\BrainSim
+    description: Brain simulation viewer and CandidaX API integration
+    status: ACTIVE
+    health: 100%
+    report_prefix: BrainSim
+    reporting_config_path: _reporting.yml
+  - id: taskboard
+    name: TaskBoard
+    path: C:\Work\TaskBoard
+    description: AI-powered Kanban and task extraction
+    status: ACTIVE
+    health: 100%
+    report_prefix: TaskBoard
+    reporting_config_path: _reporting.yml
+  - id: plantformorg
+    name: PlantFormOrg
+    path: C:\Work\PlantFormOrg
+    description: Global Plant Bio-Platform Infrastructure
+    status: RUNNING
+    health: 98%
+    report_prefix: PlantFormOrg
+    reporting_config_path: _reporting.yml
+  - id: candidax
+    name: CandidaX
+    path: C:\Work\CandidaX
+    description: AI-driven Drug Candidate Engine
+    status: ACTIVE
+    health: 96%
+    report_prefix: CandidaX
+    reporting_config_path: _reporting.yml
+  - id: cybersecurity
+    name: Cybersecurity
+    path: C:\Work\Cybersecurity
+    description: Enterprise Security Audit Toolkit
+    status: PROTECTED
+    health: 94%
+    report_prefix: Cybersecurity
+    reporting_config_path: _reporting.yml
