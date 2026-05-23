@@ -91,9 +91,18 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="max-w-4xl mx-auto mt-12 pt-6 border-t border-zinc-900">
-        <p className="text-xs text-zinc-600 text-center font-mono">
-          {MCP_URL}
+      <div className="max-w-4xl mx-auto mt-12 pt-6 border-t border-zinc-900 flex flex-col items-center gap-1">
+        <p className="text-xs text-zinc-600 font-mono">{MCP_URL}</p>
+        <p className="text-xs text-zinc-700">
+          © 2026 Eijex.{' '}
+          <a
+            href="https://www.apache.org/licenses/LICENSE-2.0"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-500 transition-colors"
+          >
+            Apache License 2.0
+          </a>
         </p>
       </div>
     </div>

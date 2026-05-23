@@ -162,6 +162,117 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     relatedTools: ['query_pubmed', 'query_kegg'],
   },
 
+  {
+    name: 'query_ncbi',
+    displayName: 'query_ncbi',
+    icon: '🧫',
+    group: 'skill',
+    description: 'Search NCBI protein or nucleotide database for sequence summaries and accession numbers.',
+    longDescription:
+      'Searches NCBI via E-utilities and returns accession numbers, organism, and sequence length. ' +
+      'Supports protein and nucleotide databases. ' +
+      'Useful for finding reference sequences before codon optimization.',
+    tags: ['Sequence', 'NCBI', 'Biotech'],
+    parameters: [
+      { name: 'query', type: 'string', required: true, description: 'Gene/protein name or accession (e.g. "GFP Aequorea victoria")' },
+      { name: 'db', type: 'string', required: false, description: 'protein | nucleotide (default: protein)' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 3, max 5)' },
+    ],
+    keyFeatures: [
+      'NCBI E-utilities esearch + esummary',
+      'Returns accession, organism, sequence length',
+      'Supports protein and nucleotide databases',
+    ],
+    useCases: [
+      'Finding reference protein sequences for codon optimization',
+      'Retrieving accession numbers for downstream analysis',
+      'Cross-checking sequence identity before design',
+    ],
+    relatedTools: ['query_uniprot', 'factorforge_optimize_cds'],
+  },
+  {
+    name: 'query_uniprot',
+    displayName: 'query_uniprot',
+    icon: '🔗',
+    group: 'skill',
+    description: 'Search UniProt for protein entries — accession, gene names, organism, function, and sequence length.',
+    longDescription:
+      'Searches UniProt via the REST API and returns protein entries with accession, gene names, organism, reviewed status, and sequence length. ' +
+      'Swiss-Prot reviewed entries are flagged. ' +
+      'Use the returned accession with query_alphafold for structure prediction lookup.',
+    tags: ['Protein', 'UniProt', 'Biotech'],
+    parameters: [
+      { name: 'query', type: 'string', required: true, description: 'Protein name, gene symbol, or UniProt accession (e.g. "GFP", "P42212")' },
+      { name: 'organism', type: 'string', required: false, description: 'Organism filter (e.g. "human", "Aequorea victoria")' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
+    ],
+    keyFeatures: [
+      'UniProt REST API search',
+      'Flags Swiss-Prot reviewed entries',
+      'Returns accession, gene, organism, length',
+    ],
+    useCases: [
+      'Finding UniProt accession before querying AlphaFold',
+      'Checking protein annotation and review status',
+      'Cross-species protein lookup',
+    ],
+    relatedTools: ['query_alphafold', 'query_pdb', 'query_ncbi'],
+  },
+  {
+    name: 'query_alphafold',
+    displayName: 'query_alphafold',
+    icon: '🧩',
+    group: 'skill',
+    description: 'Fetch AlphaFold structure prediction for a protein by UniProt accession.',
+    longDescription:
+      'Queries the AlphaFold Protein Structure Database (EBI) for a predicted 3D structure. ' +
+      'Returns model version, organism, coverage, and direct download links for PDB, CIF, and PAE files. ' +
+      'Use query_uniprot first to find the UniProt accession.',
+    tags: ['Structure', 'AlphaFold', 'Biotech'],
+    parameters: [
+      { name: 'uniprot_accession', type: 'string', required: true, description: 'UniProt accession (e.g. "P42212"). Use query_uniprot to find it.' },
+    ],
+    keyFeatures: [
+      'AlphaFold EBI API — no API key required',
+      'Returns PDB, CIF, and PAE download links',
+      'Includes model version and organism coverage',
+    ],
+    useCases: [
+      'Fetching predicted 3D structure for a target protein',
+      'Downloading PAE data for domain boundary analysis',
+      'Checking AlphaFold model coverage before wet-lab design',
+    ],
+    relatedTools: ['query_uniprot', 'query_pdb'],
+  },
+  {
+    name: 'query_opentargets',
+    displayName: 'query_opentargets',
+    icon: '🎯',
+    group: 'skill',
+    description: 'Search Open Targets Platform for gene targets or diseases and their associations.',
+    longDescription:
+      'Searches the Open Targets Platform via GraphQL API for target genes or diseases. ' +
+      'Returns Ensembl IDs, names, and descriptions. ' +
+      'Useful for target identification, disease association lookup, and drug target prioritization.',
+    tags: ['Target', 'Disease', 'Biotech'],
+    parameters: [
+      { name: 'query', type: 'string', required: true, description: 'Gene symbol or disease name (e.g. "EGFR", "Parkinson disease")' },
+      { name: 'entity', type: 'string', required: false, description: 'target | disease (default: target)' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
+    ],
+    keyFeatures: [
+      'Open Targets GraphQL API — free, no key required',
+      'Search targets (Ensembl ID) or diseases (EFO ID)',
+      'Returns name, description, and platform link',
+    ],
+    useCases: [
+      'Target identification and prioritization',
+      'Disease-gene association lookup',
+      'Drug target landscape mapping',
+    ],
+    relatedTools: ['query_pubmed', 'query_clinicaltrials'],
+  },
+
   // ── Workflows ─────────────────────────────────────────────────────────
   {
     name: 'factorforge_verify_parameter',
