@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { ALL_TOOLS } from './_lib/mcp-tools';
 import McpToolCard from './_components/McpToolCard';
 
@@ -42,14 +43,21 @@ export default function Home() {
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-            <span className="text-sm">⚡</span>
-          </div>
           <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">BioDesign Execution Layer</span>
         </div>
-        <h1 className="text-3xl font-bold text-zinc-100 mb-2">
-          Eijex MCP
-        </h1>
+        <div className="flex items-center gap-4 mb-2">
+          <Image
+            src="/logo.jpg"
+            alt="Eijex"
+            width={48}
+            height={48}
+            className="rounded-xl"
+            priority
+          />
+          <h1 className="text-3xl font-bold text-zinc-100">
+            Eijex MCP
+          </h1>
+        </div>
         <p className="text-zinc-400 text-base mb-8">
           Turns scientific context into validated CDS and construct design artifacts
         </p>
