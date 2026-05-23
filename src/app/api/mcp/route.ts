@@ -75,11 +75,37 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Search keywords (e.g. "NMOSD AQP4", "AAV gene therapy")' },
+        query: { type: 'string', description: 'Search keywords (e.g. "type 2 diabetes GLP-1", "Alzheimer tau immunotherapy")' },
         status: { type: 'string', description: 'Trial status filter: RECRUITING | ACTIVE_NOT_RECRUITING | COMPLETED (optional)' },
         max_results: { type: 'number', description: 'Maximum number of trials (default: 5)' },
       },
       required: ['query'],
+    },
+  },
+  {
+    name: 'factorforge_verify_parameter',
+    description: 'Initialize a structured 0→7 step research workflow to verify or update a FactorForge design constant (e.g. GC_OPT_MIN, CAI_THRESHOLD). Returns a ready-to-execute research plan with pre-filled PubMed queries and decision gates.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        param: {
+          type: 'string',
+          description: 'Parameter name as it appears in the codebase (e.g. "GC_OPT_MIN", "CAI_THRESHOLD", "RAMP_WINDOW")',
+        },
+        current_value: {
+          type: 'string',
+          description: 'Current value in the codebase (e.g. "55.0", "0.80")',
+        },
+        hypothesis: {
+          type: 'string',
+          description: 'Optional: what you expect the correct value to be, or why you are questioning the current value',
+        },
+        keywords: {
+          type: 'string',
+          description: 'Optional: additional PubMed keywords to include (e.g. "Nicotiana benthamiana transient expression")',
+        },
+      },
+      required: ['param', 'current_value'],
     },
   },
 ];
@@ -266,6 +292,84 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       });
 
       return `## ClinicalTrials.gov — "${query}" (${lines.length} results)\n\n${lines.join('\n\n')}`;
+    }
+
+    // ── factorforge_verify_parameter ──────────────────────────────────
+    case 'factorforge_verify_parameter': {
+      const param = args.param as string;
+      const currentValue = args.current_value as string;
+      const hypothesis = (args.hypothesis as string) || '';
+      const extraKeywords = (args.keywords as string) || '';
+
+      const baseKeywords = `${param.replace(/_/g, ' ').toLowerCase()} codon optimization Nicotiana benthamiana`;
+      const searchTerms = [
+        `"${baseKeywords}"`,
+        `"GC content plant transient expression CDS"`,
+        `"codon usage ${extraKeywords || 'N. benthamiana recombinant protein'}"`,
+      ];
+
+      return [
+        `## FactorForge Parameter Verification Workflow`,
+        ``,
+        `**Parameter**: \`${param}\``,
+        `**Current value**: ${currentValue}`,
+        `**Hypothesis**: ${hypothesis || '(none provided)'}`,
+        ``,
+        `---`,
+        ``,
+        `### STEP 0 — Question Definition`,
+        `What is the evidence-based optimal value for \`${param}\` in FactorForge CDS optimization?`,
+        `Is the current value **${currentValue}** supported by published literature?`,
+        ``,
+        `### STEP 1 — Literature Search`,
+        `Run these queries with \`query_pubmed\` (max_results: 10 each):`,
+        ...searchTerms.map((t) => `- ${t}`),
+        ``,
+        `### STEP 2 — Structural Reference`,
+        `Run with \`query_pdb\`: \`"plant codon optimized gene expression"\``,
+        ``,
+        `### STEP 3 — Pathway Context`,
+        `Run with \`query_kegg\`: \`"plant gene expression"\` (organism: nta = N. tabacum proxy)`,
+        ``,
+        `> ⛔ **GATE 3.5 — Literature Review Decision**`,
+        `> Collect PMIDs from Steps 1–3. Record the reported value range.`,
+        `> **Question**: Does published evidence support the current value of **${currentValue}**?`,
+        `> Answer: yes / no / unclear — before proceeding to STEP 4.`,
+        ``,
+        `### STEP 4 — Quantify Evidence`,
+        `- Count studies reporting a value or range for this parameter`,
+        `- Note the consensus range (e.g. 50–65% for GC content)`,
+        `- Is the current value **${currentValue}** within the reported consensus?`,
+        ``,
+        `### STEP 5 — Consensus Check`,
+        `- Minimum evidence threshold: n ≥ 3 independent studies`,
+        `- Calculate weighted midpoint from the reported ranges`,
+        `- Flag contradicting papers`,
+        ``,
+        `### STEP 6 — Code Impact Analysis`,
+        `Before changing, confirm which files define this constant:`,
+        `- \`src/factorforge/engines/v2/scoring.py\``,
+        `- \`api/optimize.py\` (may have a separate DEFAULT_ variant — independent decision)`,
+        ``,
+        `> ⛔ **GATE 6.5 — Update Decision**`,
+        `> Recommend: **Keep at ${currentValue}** — or — **Update to [new value]**`,
+        `> Justification: [PMIDs], n=[X] studies, consensus range=[range], mean=[value]`,
+        ``,
+        `### STEP 7 — Report`,
+        `Record result in \`parameter_registry.yaml\`:`,
+        '```yaml',
+        `${param}:`,
+        `  current_value: ${currentValue}`,
+        `  recommended_value: # fill in`,
+        `  pmids: []`,
+        `  n_studies: 0`,
+        `  verified: ${new Date().toISOString().slice(0, 10)}`,
+        `  source_file: src/factorforge/engines/v2/scoring.py`,
+        '```',
+        ``,
+        `---`,
+        `*Generated by factorforge_verify_parameter — start with STEP 1 using query_pubmed.*`,
+      ].join('\n');
     }
 
     default:

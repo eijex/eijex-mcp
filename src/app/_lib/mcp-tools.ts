@@ -134,7 +134,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Useful for competitive intelligence, trial design, and patient eligibility.',
     tags: ['Clinical', 'Trials', 'Research'],
     parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Search keywords (e.g. "NMOSD AQP4")' },
+      { name: 'query', type: 'string', required: true, description: 'Search keywords (e.g. "type 2 diabetes GLP-1")' },
       { name: 'status', type: 'string', required: false, description: 'RECRUITING | ACTIVE_NOT_RECRUITING | COMPLETED' },
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5)' },
     ],
@@ -149,6 +149,35 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Trial design reference lookup',
     ],
     relatedTools: ['query_pubmed', 'query_kegg'],
+  },
+  {
+    name: 'factorforge_verify_parameter',
+    displayName: 'factorforge_verify_parameter',
+    icon: '🔍',
+    description: 'Initialize a structured 0→7 step research workflow to verify or update a FactorForge design constant.',
+    longDescription:
+      'Generates a ready-to-execute parameter verification plan for any FactorForge constant (e.g. GC_OPT_MIN, CAI_THRESHOLD). ' +
+      'Returns pre-filled PubMed search queries, decision gates at steps 3.5 and 6.5, and a parameter_registry.yaml template. ' +
+      'Start with query_pubmed to execute each step.',
+    tags: ['FactorForge', 'Workflow', 'Verification'],
+    parameters: [
+      { name: 'param', type: 'string', required: true, description: 'Parameter name as it appears in the codebase (e.g. "GC_OPT_MIN")' },
+      { name: 'current_value', type: 'string', required: true, description: 'Current value in the codebase (e.g. "55.0")' },
+      { name: 'hypothesis', type: 'string', required: false, description: 'What you expect the correct value to be, or why you are questioning the current value' },
+      { name: 'keywords', type: 'string', required: false, description: 'Additional PubMed keywords (e.g. "Nicotiana benthamiana transient expression")' },
+    ],
+    keyFeatures: [
+      '0→7 step structured research workflow',
+      'Pre-filled PubMed search queries for each parameter',
+      'Decision gates at STEP 3.5 and STEP 6.5',
+      'parameter_registry.yaml output template',
+    ],
+    useCases: [
+      'Verify GC% thresholds against published literature',
+      'Validate CAI cutoff values for N. benthamiana expression',
+      'Re-evaluate any FactorForge scoring constant with new evidence',
+    ],
+    relatedTools: ['factorforge_optimize_cds', 'query_pubmed', 'query_pdb'],
   },
 ];
 
