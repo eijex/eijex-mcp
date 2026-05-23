@@ -12,6 +12,18 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Eijex MCP",
   description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+  openGraph: {
+    title: "Eijex MCP",
+    description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+    url: "https://eijex-mcp.vercel.app",
+    siteName: "Eijex MCP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Eijex MCP",
+    description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+  },
 };
 
 export default function RootLayout({

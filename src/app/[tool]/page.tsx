@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tool: str
   const tool = TOOL_MAP[toolName];
   if (!tool) return {};
   return {
-    title: `${tool.displayName} — MCP Server`,
+    title: `${tool.displayName} — Eijex MCP`,
     description: tool.description,
   };
 }
@@ -60,10 +60,16 @@ export default async function ToolPage({ params }: { params: Promise<{ tool: str
               {tool.displayName}
             </h1>
           </div>
-          <p className="text-xs text-zinc-500 mb-3">
-            by{' '}
-            <span className="text-zinc-400 font-medium">Eijex</span>
-          </p>
+          <div className="flex items-center gap-2 mb-3">
+            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase tracking-wide border ${
+              tool.group === 'agent'    ? 'bg-violet-950 text-violet-400 border-violet-800' :
+              tool.group === 'workflow' ? 'bg-blue-950 text-blue-400 border-blue-800' :
+                                         'bg-zinc-900 text-zinc-400 border-zinc-700'
+            }`}>
+              {tool.group}
+            </span>
+            <span className="text-xs text-zinc-600">by Eijex</span>
+          </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
             {tool.tags.map((tag) => (
               <span

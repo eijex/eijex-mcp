@@ -91,10 +91,11 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="max-w-4xl mx-auto mt-12 pt-6 border-t border-zinc-900 flex flex-col items-center gap-1">
+      <div className="max-w-4xl mx-auto mt-12 pt-6 border-t border-zinc-900 flex flex-col items-center gap-1.5">
         <p className="text-xs text-zinc-600 font-mono">{MCP_URL}</p>
-        <p className="text-xs text-zinc-700">
-          © 2026 Eijex.{' '}
+        <div className="flex items-center gap-3 text-xs text-zinc-700">
+          <span>© 2026 Eijex</span>
+          <span>·</span>
           <a
             href="https://www.apache.org/licenses/LICENSE-2.0"
             target="_blank"
@@ -103,7 +104,16 @@ export default function Home() {
           >
             Apache License 2.0
           </a>
-        </p>
+          <span>·</span>
+          <a
+            href="https://github.com/eijex/eijex-mcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-500 transition-colors"
+          >
+            GitHub
+          </a>
+        </div>
       </div>
     </div>
   );
