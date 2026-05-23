@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ALL_TOOLS, TOOL_MAP } from '../_lib/mcp-tools';
 import McpToolCard from '../_components/McpToolCard';
 
-const MCP_URL = 'https://mcp-server-munkyukim86s-projects.vercel.app/api/mcp';
+const MCP_URL = 'https://eijex-mcp.vercel.app/api/mcp';
 
 export function generateStaticParams() {
   return ALL_TOOLS.map((t) => ({ tool: t.name }));
@@ -32,7 +32,7 @@ export default async function ToolPage({ params }: { params: Promise<{ tool: str
 
   const connectionSnippet = `{
   "mcpServers": {
-    "instructions-lib": {
+    "eijex": {
       "type": "http",
       "url": "${MCP_URL}"
     }
@@ -62,7 +62,7 @@ export default async function ToolPage({ params }: { params: Promise<{ tool: str
           </div>
           <p className="text-xs text-zinc-500 mb-3">
             by{' '}
-            <span className="text-zinc-400 font-medium">munkyukim86</span>
+            <span className="text-zinc-400 font-medium">Eijex</span>
           </p>
           <div className="flex flex-wrap gap-1.5 mb-4">
             {tool.tags.map((tag) => (

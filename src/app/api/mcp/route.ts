@@ -3,10 +3,10 @@
  * Protocol: JSON-RPC 2.0 over HTTP (Streamable HTTP transport)
  *
  * Connect from Claude Code (.mcp.json):
- *   { "mcpServers": { "eijex": { "type": "http", "url": "https://mcp-server-ai.vercel.app/api/mcp" } } }
+ *   { "mcpServers": { "eijex": { "type": "http", "url": "https://eijex-mcp.vercel.app/api/mcp" } } }
  *
  * Connect from VSCode Copilot (settings.json):
- *   { "mcp": { "servers": { "eijex": { "type": "http", "url": "https://mcp-server-ai.vercel.app/api/mcp" } } } }
+ *   { "mcp": { "servers": { "eijex": { "type": "http", "url": "https://eijex-mcp.vercel.app/api/mcp" } } } }
  */
 
 import { NextRequest, NextResponse } from 'next/server';

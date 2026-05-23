@@ -12,7 +12,31 @@ const CONNECTION_SNIPPET = `{
   }
 }`;
 
+const SECTIONS = [
+  {
+    key: 'agent' as const,
+    label: 'Agents',
+    description: 'Execute design tasks — call external engines and return validated artifacts.',
+  },
+  {
+    key: 'skill' as const,
+    label: 'Skills',
+    description: 'Query biomedical databases — literature, structures, pathways, and trials.',
+  },
+  {
+    key: 'workflow' as const,
+    label: 'Workflows',
+    description: 'Multi-step research protocols — structured pipelines with decision gates.',
+  },
+] as const;
+
 export default function Home() {
+  const toolsByGroup = {
+    agent: ALL_TOOLS.filter((t) => t.group === 'agent'),
+    skill: ALL_TOOLS.filter((t) => t.group === 'skill'),
+    workflow: ALL_TOOLS.filter((t) => t.group === 'workflow'),
+  };
+
   return (
     <div className="min-h-screen py-12 px-6">
       {/* Header */}
@@ -42,21 +66,28 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Tool grid */}
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
-            Available Tools
-            <span className="ml-2 text-zinc-600 font-normal normal-case tracking-normal">
-              {ALL_TOOLS.length} tools
-            </span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ALL_TOOLS.map((tool) => (
-            <McpToolCard key={tool.name} tool={tool} />
-          ))}
-        </div>
+      {/* Tool sections */}
+      <div className="max-w-4xl mx-auto space-y-12">
+        {SECTIONS.map(({ key, label, description }) => {
+          const tools = toolsByGroup[key];
+          if (tools.length === 0) return null;
+          return (
+            <section key={key}>
+              <div className="flex items-baseline gap-3 mb-1">
+                <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+                  {label}
+                </h2>
+                <span className="text-xs text-zinc-600 font-mono">{tools.length}</span>
+              </div>
+              <p className="text-xs text-zinc-500 mb-5">{description}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tools.map((tool) => (
+                  <McpToolCard key={tool.name} tool={tool} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {/* Footer */}

@@ -5,12 +5,15 @@ export interface McpParameter {
   description: string;
 }
 
+export type McpToolGroup = 'agent' | 'skill' | 'workflow';
+
 export interface McpToolDefinition {
   name: string;
   displayName: string;
   description: string;
   longDescription: string;
   icon: string;
+  group: McpToolGroup;
   tags: string[];
   parameters: McpParameter[];
   keyFeatures: string[];
@@ -19,10 +22,12 @@ export interface McpToolDefinition {
 }
 
 export const ALL_TOOLS: McpToolDefinition[] = [
+  // ── Agents ────────────────────────────────────────────────────────────
   {
     name: 'factorforge_optimize_cds',
     displayName: 'factorforge_optimize_cds',
     icon: '🧬',
+    group: 'agent',
     description: 'Optimize a protein sequence into a codon-adapted DNA CDS for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into an optimized coding DNA sequence (CDS) for expression in Nicotiana benthamiana. ' +
@@ -46,10 +51,13 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['query_pubmed', 'query_pdb'],
   },
+
+  // ── Skills ────────────────────────────────────────────────────────────
   {
     name: 'query_pubmed',
     displayName: 'query_pubmed',
     icon: '📄',
+    group: 'skill',
     description: 'Search PubMed for scientific literature.',
     longDescription:
       'Searches PubMed via NCBI E-utilities and returns paper titles, authors, journal, and links. ' +
@@ -75,6 +83,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     name: 'query_pdb',
     displayName: 'query_pdb',
     icon: '🔬',
+    group: 'skill',
     description: 'Search the RCSB Protein Data Bank for 3D protein structures.',
     longDescription:
       'Searches RCSB PDB for protein structures by name or PDB ID. ' +
@@ -82,7 +91,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Useful for structural biology, drug target analysis, and protein engineering.',
     tags: ['Structure', 'Protein', 'Biotech'],
     parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Protein name or PDB ID (e.g. "CD47", "1TZV")' },
+      { name: 'query', type: 'string', required: true, description: 'Protein name or PDB ID (e.g. "EGFR", "1IVO")' },
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5)' },
     ],
     keyFeatures: [
@@ -101,6 +110,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     name: 'query_kegg',
     displayName: 'query_kegg',
     icon: '🗺️',
+    group: 'skill',
     description: 'Search KEGG for biological pathways.',
     longDescription:
       'Searches the KEGG pathway database for biological pathways related to a keyword. ' +
@@ -127,6 +137,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     name: 'query_clinicaltrials',
     displayName: 'query_clinicaltrials',
     icon: '🏥',
+    group: 'skill',
     description: 'Search ClinicalTrials.gov for registered clinical trials.',
     longDescription:
       'Searches ClinicalTrials.gov v2 API for clinical trials by keyword and status. ' +
@@ -150,14 +161,17 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['query_pubmed', 'query_kegg'],
   },
+
+  // ── Workflows ─────────────────────────────────────────────────────────
   {
     name: 'factorforge_verify_parameter',
     displayName: 'factorforge_verify_parameter',
     icon: '🔍',
+    group: 'workflow',
     description: 'Initialize a structured 0→7 step research workflow to verify or update a FactorForge design constant.',
     longDescription:
       'Generates a ready-to-execute parameter verification plan for any FactorForge constant (e.g. GC_OPT_MIN, CAI_THRESHOLD). ' +
-      'Returns pre-filled PubMed search queries, decision gates at steps 3.5 and 6.5, and a parameter_registry.yaml template. ' +
+      'Returns pre-filled PubMed search queries, decision gates at steps 3.5 and 6.5, and a registry output template. ' +
       'Start with query_pubmed to execute each step.',
     tags: ['FactorForge', 'Workflow', 'Verification'],
     parameters: [
@@ -170,7 +184,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       '0→7 step structured research workflow',
       'Pre-filled PubMed search queries for each parameter',
       'Decision gates at STEP 3.5 and STEP 6.5',
-      'parameter_registry.yaml output template',
+      'Registry output template for traceability',
     ],
     useCases: [
       'Verify GC% thresholds against published literature',
