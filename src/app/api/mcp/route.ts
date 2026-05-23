@@ -397,7 +397,7 @@ export async function GET() {
     transport: 'streamable-http',
     endpoint: '/api/mcp',
     tools: TOOLS.length,
-    source: 'https://github.com/eijex/mcp-server',
+    source: 'https://github.com/eijex/eijex-mcp',
   });
 }
 
