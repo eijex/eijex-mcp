@@ -20,15 +20,15 @@ export interface McpToolDefinition {
 
 export const ALL_TOOLS: McpToolDefinition[] = [
   {
-    name: 'codonforge_optimize',
-    displayName: 'codonforge_optimize',
+    name: 'factorforge_optimize_cds',
+    displayName: 'factorforge_optimize_cds',
     icon: '🧬',
     description: 'Optimize a protein sequence into a codon-adapted DNA CDS for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into an optimized coding DNA sequence (CDS) for expression in Nicotiana benthamiana. ' +
       'Uses the FactorForge v2 rule-based engine: reverse translation, rule scanning, Golden Gate domestication, and output. ' +
       'Returns CAI score, GC%, and the optimized DNA sequence.',
-    tags: ['CodonForge', 'Biotech', 'DNA'],
+    tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
       { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery' },
@@ -95,7 +95,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Structural analysis for drug design',
       'Protein engineering reference lookup',
     ],
-    relatedTools: ['query_pubmed', 'codonforge_optimize'],
+    relatedTools: ['query_pubmed', 'factorforge_optimize_cds'],
   },
   {
     name: 'query_kegg',
@@ -149,80 +149,6 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Trial design reference lookup',
     ],
     relatedTools: ['query_pubmed', 'query_kegg'],
-  },
-  {
-    name: 'get_model_recommendations',
-    displayName: 'get_model_recommendations',
-    icon: '🤖',
-    description: 'Get AI model recommendations by task type.',
-    longDescription:
-      'Returns the best Claude model and IDE configuration for a specific task type. ' +
-      'Covers code optimization, completion, documentation, research, code review, and structured extraction.',
-    tags: ['AI', 'Models', 'Workflow'],
-    parameters: [
-      { name: 'taskType', type: 'string', required: false, description: 'code-optimization | code-completion | documentation | research | code-review | structured-extraction' },
-    ],
-    keyFeatures: [
-      'Claude model selection guide',
-      'IDE recommendation per task',
-      'Token level guidance',
-    ],
-    useCases: [
-      'Choosing the right Claude model for a task',
-      'Optimizing AI workflow configuration',
-      'Comparing model capabilities by use case',
-    ],
-    relatedTools: ['get_skill_template', 'get_operational_prompt_template'],
-  },
-  {
-    name: 'get_skill_template',
-    displayName: 'get_skill_template',
-    icon: '📝',
-    description: 'Get a Claude skill template for a new project domain.',
-    longDescription:
-      'Returns a ready-to-use markdown template for .claude/skills/<domain>/skill.md. ' +
-      'Helps teams standardize Claude skill definitions across projects.',
-    tags: ['Skills', 'Template', 'Workflow'],
-    parameters: [
-      { name: 'projectName', type: 'string', required: true, description: 'Project name' },
-      { name: 'domain', type: 'string', required: true, description: 'Domain (e.g. bioinformatics, security, web-app)' },
-    ],
-    keyFeatures: [
-      'Structured skill template',
-      'Includes workflow, conventions, tools sections',
-      'Ready to paste into .claude/skills/',
-    ],
-    useCases: [
-      'Starting a new Claude skill for a project',
-      'Standardizing AI workflow documentation',
-      'Onboarding AI agents to a new domain',
-    ],
-    relatedTools: ['get_model_recommendations', 'get_operational_prompt_template'],
-  },
-  {
-    name: 'get_operational_prompt_template',
-    displayName: 'get_operational_prompt_template',
-    icon: '⚙️',
-    description: 'Get reusable operational prompt templates for architecture, troubleshooting, and cost audits.',
-    longDescription:
-      'Returns structured prompt templates for common operational tasks: architecture decisions, log analysis, and FinOps cost audits. ' +
-      'Designed for AI-assisted technical operations.',
-    tags: ['Prompts', 'Operations', 'Safety'],
-    parameters: [
-      { name: 'templateId', type: 'string', required: false, description: 'architecture-decision | troubleshooting-log-analysis | cost-audit-finops' },
-    ],
-    keyFeatures: [
-      '3 reusable operational templates',
-      'Architecture decision framework',
-      'Log troubleshooting guide',
-      'FinOps cost audit checklist',
-    ],
-    useCases: [
-      'Structuring an architecture decision record',
-      'Diagnosing production issues with AI',
-      'Running a cloud cost audit',
-    ],
-    relatedTools: ['get_model_recommendations', 'get_skill_template'],
   },
 ];
 
