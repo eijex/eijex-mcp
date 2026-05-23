@@ -10,8 +10,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MCP Server — Personal Hub",
-  description: "Private MCP server for AI development workflows",
+  title: "Eijex MCP",
+  description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
 };
 
 export default function RootLayout({

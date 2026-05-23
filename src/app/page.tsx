@@ -21,13 +21,13 @@ export default function Home() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
             <span className="text-sm">⚡</span>
           </div>
-          <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Eijex MCP</span>
+          <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">BioDesign Execution Layer</span>
         </div>
         <h1 className="text-3xl font-bold text-zinc-100 mb-2">
-          Eijex MCP Server
+          Eijex MCP
         </h1>
         <p className="text-zinc-400 text-base mb-8">
-          Codon optimization + biomedical databases + AI workflow tools
+          Turns scientific context into validated CDS and construct design artifacts
         </p>
 
         {/* Connection snippet */}
