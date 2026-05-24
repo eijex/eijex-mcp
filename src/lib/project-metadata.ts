@@ -45,18 +45,16 @@ export const WORKFLOW_METADATA: Record<string, WorkflowMetadata> = {
     icon: 'FileText',
   },
 
-  // PlantFormOrg
   'WF-BIO-RESEARCH-PIPELINE': {
     title: 'Bio Research Pipeline',
     description: '논문 발굴부터 엔진 배포까지 6단계 자동화 파이프라인.',
-    why: '최신 바이오 연구를 CodonForge·YieldPredict 엔진에 빠르고 안전하게 반영하기 위해 존재한다.',
+    why: '최신 바이오 연구를 FactorForge·YieldPredict 엔진에 빠르고 안전하게 반영하기 위해 존재한다.',
     icon: 'Cpu',
   },
 
-  // CodonForge
-  'WF-CODONFORGE-RESEARCH-TO-ENGINE': {
+  'WF-FACTORFORGE-RESEARCH-TO-ENGINE': {
     title: 'Engine Optimization Loop',
-    description: 'Specialized pipeline for CodonForge engine updates.',
+    description: 'Specialized pipeline for FactorForge engine updates.',
     why: 'Optimizes the core bioinformatics engine with the latest research findings.',
     icon: 'Zap',
   },

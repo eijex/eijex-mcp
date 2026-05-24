@@ -19,7 +19,7 @@
 
 | Tool | Description |
 |------|-------------|
-| `codonforge_optimize` | Generate a codon-optimized CDS for *N. benthamiana* expression |
+| `factorforge_optimize_cds` | Generate a codon-optimized CDS for *N. benthamiana* expression |
 | `query_pubmed` | Search PubMed for scientific literature |
 | `query_pdb` | Search RCSB PDB for 3D protein structures |
 | `query_kegg` | Search KEGG for biological pathways |
