@@ -36,7 +36,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
-      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery' },
+      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
     ],
     keyFeatures: [
       'Rule-based codon optimization for N. benthamiana',
