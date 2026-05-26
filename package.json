@@ -1,7 +1,8 @@
 {
-  "name": "mcp",
-  "version": "0.1.0",
+  "name": "eijex-mcp",
+  "version": "1.0.0",
   "private": true,
+  "description": "Eijex MCP server for FactorForge CDS and bio-AI workflow tools",
   "license": "MIT",
   "scripts": {
     "dev": "node scripts/generate-data.mjs && next dev",
