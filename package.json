@@ -2,6 +2,7 @@
   "name": "mcp",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "node scripts/generate-data.mjs && next dev",
     "build": "node scripts/generate-data.mjs && next build",
