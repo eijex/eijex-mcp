@@ -16,7 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const TOOLS = [
   {
     name: 'factorforge_optimize_cds',
-    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for expression in Nicotiana benthamiana using FactorForge CDS v3.1.2. Default uses constraint-based DP feasibility design. Legacy v2 profiles available when specified.',
+    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for expression in Nicotiana benthamiana using FactorForge CDS v3.1.3. Default uses constraint-based DP feasibility design. Legacy v2 profiles available when specified.',
     inputSchema: {
       type: 'object',
       properties: {
