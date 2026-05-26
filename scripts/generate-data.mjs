@@ -1,5 +1,5 @@
 /**
- * Build-time data generator for instructions-lib web UI.
+ * Build-time data generator for eijex-mcp web UI.
  * Reads YAML/MD files from the repository and generates a JSON file
  * that can be imported at build time instead of reading filesystem at runtime.
  * Supports Global + Project-level hierarchy.
