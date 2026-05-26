@@ -31,7 +31,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Optimize a protein sequence into a codon-adapted DNA CDS for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into an optimized coding DNA sequence (CDS) for expression in Nicotiana benthamiana. ' +
-      'Uses the FactorForge v2 rule-based engine: reverse translation, rule scanning, Golden Gate domestication, and output. ' +
+      'Uses the FactorForge v3.x stable design path: DP feasibility design, profile-based rule scanning, Golden Gate domestication, and output. ' +
       'Returns CAI score, GC%, and the optimized DNA sequence.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
