@@ -212,7 +212,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         '```',
         warnings ? `\n${warnings}` : '',
         '',
-        `Powered by [FactorForge CDS](https://factorforge-cds.vercel.app) (Apache 2.0)`,
+        `Powered by [FactorForge CDS](https://factorforge-cds.vercel.app) (AGPL-3.0)`,
       ].filter((l) => l !== undefined).join('\n').trim();
     }
 
@@ -398,7 +398,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         ``,
         `### STEP 6 — Code Impact Analysis`,
         `Before changing, confirm which files define this constant:`,
-        `- \`src/factorforge/engines/v2/scoring.py\``,
+        `- \`src/factorforge/engines/profile/scoring.py\``,
         `- \`api/optimize.py\` (may have a separate DEFAULT_ variant — independent decision)`,
         ``,
         `> ⛔ **GATE 6.5 — Update Decision**`,
@@ -414,7 +414,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         `  pmids: []`,
         `  n_studies: 0`,
         `  verified: ${new Date().toISOString().slice(0, 10)}`,
-        `  source_file: src/factorforge/engines/v2/scoring.py`,
+        `  source_file: src/factorforge/engines/profile/scoring.py`,
         '```',
         ``,
         `---`,

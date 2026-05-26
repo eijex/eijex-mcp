@@ -105,12 +105,12 @@ export default function Home() {
           <span>© 2026 Eijex</span>
           <span>·</span>
           <a
-            href="https://www.apache.org/licenses/LICENSE-2.0"
+            href="https://opensource.org/license/mit/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-zinc-500 transition-colors"
           >
-            Apache License 2.0
+            MIT License
           </a>
           <span>·</span>
           <a
