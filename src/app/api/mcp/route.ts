@@ -184,6 +184,24 @@ const TOOLS = [
       required: ['query'],
     },
   },
+  {
+    name: 'query_chembl',
+    description: 'Search ChEMBL for bioactive compounds, drug targets, and bioactivity data. Useful for drug discovery, target validation, and compound screening.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Target name or compound keyword (e.g. "AQP4", "aquaporin-4")' },
+        search_type: {
+          type: 'string',
+          description: 'target = find protein targets | compound = find small molecules | activity = get bioactivity data for a known ChEMBL target ID (default: target)',
+          enum: ['target', 'compound', 'activity'],
+        },
+        chembl_id: { type: 'string', description: 'ChEMBL target ID (e.g. "CHEMBL2093872"). Required when search_type=activity.' },
+        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
+      },
+      required: ['query'],
+    },
+  },
 ];
 
 // ── Tool handlers ──────────────────────────────────────────────────────
@@ -708,6 +726,36 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       );
 
       return `## Reactome Pathways — "${query}" (${species})\n\n${lines.join('\n\n')}`;
+    }
+
+    // ── query_chembl ────────────────────────────────────────────────────────
+    case 'query_chembl': {
+      const q = String(args.query ?? '');
+      const searchType = String(args.search_type ?? 'target');
+      const chemblId = args.chembl_id ? String(args.chembl_id) : null;
+      const maxResults = Math.min(Number(args.max_results ?? 5), 10);
+
+      let url: string;
+      if (searchType === 'activity' && chemblId) {
+        url = `https://www.ebi.ac.uk/chembl/api/data/activity?target_chembl_id=${encodeURIComponent(chemblId)}&format=json&limit=${maxResults}`;
+      } else if (searchType === 'compound') {
+        url = `https://www.ebi.ac.uk/chembl/api/data/molecule/search?q=${encodeURIComponent(q)}&format=json&limit=${maxResults}`;
+      } else {
+        url = `https://www.ebi.ac.uk/chembl/api/data/target/search?q=${encodeURIComponent(q)}&format=json&limit=${maxResults}`;
+      }
+
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error(`ChEMBL API error: ${res.status}`);
+      const data = await res.json() as Record<string, unknown>;
+
+      const items =
+        (data.targets as unknown[]) ??
+        (data.molecules as unknown[]) ??
+        (data.activities as unknown[]) ??
+        [];
+
+      if (items.length === 0) return `No ChEMBL results found for: ${q}`;
+      return JSON.stringify({ source: 'ChEMBL', search_type: searchType, query: q, results: items }, null, 2);
     }
 
     default:

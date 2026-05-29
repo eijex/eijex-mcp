@@ -1,0 +1,6 @@
+{
+  "name": "eijex",
+  "version": "1.0.0",
+  "description": "Biotech research tools: codon optimization (FactorForge), literature search, protein structures, pathways, clinical trials, and compound screening for drug discovery.",
+  "author": { "name": "eijex" }
+}

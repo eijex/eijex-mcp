@@ -306,6 +306,27 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     useCases: ['분자 메커니즘 경로 조사', 'FactorForge 단백질 기능 경로 분석', 'CandidaX 질환 메커니즘'],
     relatedTools: ['query_kegg', 'query_opentargets'],
   },
+  {
+    name: 'query_chembl',
+    displayName: 'query_chembl',
+    icon: '💊',
+    group: 'skill' as McpToolGroup,
+    description: 'Search ChEMBL for bioactive compounds and drug targets.',
+    longDescription:
+      'Queries the ChEMBL database for protein targets, small molecule compounds, and bioactivity data. ' +
+      'Supports target search, compound search, and bioactivity lookup by ChEMBL target ID. ' +
+      'Useful for CandidaX AQP4 inhibitor screening and CNS drug discovery.',
+    tags: ['ChEMBL', 'Drug Discovery', 'Compound', 'Bioactivity', 'CandidaX'],
+    parameters: [
+      { name: 'query', type: 'string', required: true, description: 'Target name or compound keyword' },
+      { name: 'search_type', type: 'string', required: false, description: 'target | compound | activity' },
+      { name: 'chembl_id', type: 'string', required: false, description: 'ChEMBL target ID for activity search' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default: 5)' },
+    ],
+    keyFeatures: ['Target search', 'Compound screening', 'Bioactivity data', 'Drug discovery'],
+    useCases: ['AQP4 inhibitor search', 'CNS compound screening', 'Target validation'],
+    relatedTools: ['query_opentargets', 'query_pubmed'],
+  },
 
   // ── Workflows ─────────────────────────────────────────────────────────
   {
