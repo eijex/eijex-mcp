@@ -20,10 +20,17 @@
 | Tool | Description |
 |------|-------------|
 | `factorforge_optimize_cds` | Generate a codon-optimized CDS for *N. benthamiana* expression |
+| `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |
 | `query_pubmed` | Search PubMed for scientific literature |
 | `query_pdb` | Search RCSB PDB for 3D protein structures |
+| `query_ncbi` | Search NCBI for protein/nucleotide sequences |
+| `query_uniprot` | Search UniProt for protein sequences and annotations |
+| `query_alphafold` | Fetch AlphaFold predicted protein structures |
 | `query_kegg` | Search KEGG for biological pathways |
 | `query_clinicaltrials` | Search ClinicalTrials.gov for registered trials |
+| `query_opentargets` | Search Open Targets for drug targets and disease associations |
+| `query_fda` | Search FDA adverse events and drug labels via OpenFDA |
+| `query_reactome` | Search Reactome for biological pathways and reactions |
 | `get_model_recommendations` | Get AI model recommendations by task type |
 | `get_skill_template` | Get a Claude skill template for a new project domain |
 | `get_operational_prompt_template` | Get reusable operational prompt templates |
