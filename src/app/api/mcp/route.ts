@@ -158,6 +158,32 @@ const TOOLS = [
       required: ['query'],
     },
   },
+  {
+    name: 'query_fda',
+    description: 'Search OpenFDA for drug adverse events, drug labels, or medical device reports. Useful for drug safety research, pharmacovigilance, and regulatory intelligence.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        drug_name: { type: 'string', description: 'Drug name or active ingredient (e.g. "aspirin", "ibuprofen")' },
+        report_type: { type: 'string', description: 'Report type: adverse_event | label (default: adverse_event)', enum: ['adverse_event', 'label'] },
+        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
+      },
+      required: ['drug_name'],
+    },
+  },
+  {
+    name: 'query_reactome',
+    description: 'Search Reactome for biological pathways. Returns pathway names, stable IDs, and hierarchy. Complements KEGG with human-curated reaction-level detail.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Pathway or molecule keyword (e.g. "AQP4", "neuroinflammation", "codon")' },
+        species: { type: 'string', description: 'Species filter (default: "Homo sapiens")' },
+        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
+      },
+      required: ['query'],
+    },
+  },
 ];
 
 // ── Tool handlers ──────────────────────────────────────────────────────
@@ -588,6 +614,100 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
 
       const label = entity === 'disease' ? 'Diseases' : 'Targets';
       return `## Open Targets ${label} — "${query}" (${lines.length} results)\n\n${lines.join('\n\n')}`;
+    }
+
+    // ── query_fda ─────────────────────────────────────────────────────────
+    case 'query_fda': {
+      const drugName = args.drug_name as string;
+      const reportType = (args.report_type as string) || 'adverse_event';
+      const maxResults = Math.min((args.max_results as number) || 5, 10);
+
+      let url: string;
+      if (reportType === 'label') {
+        url = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${encodeURIComponent(drugName)}"+openfda.generic_name:"${encodeURIComponent(drugName)}"&limit=${maxResults}`;
+      } else {
+        url = `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:"${encodeURIComponent(drugName)}"&limit=${maxResults}`;
+      }
+
+      const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (resp.status === 404) return `No FDA records found for "${drugName}".`;
+      if (!resp.ok) return `OpenFDA API error: HTTP ${resp.status}`;
+
+      const data = await resp.json() as {
+        results?: Array<Record<string, unknown>>;
+        meta?: { results?: { total?: number } };
+      };
+
+      const results = data.results ?? [];
+      if (results.length === 0) return `No FDA records found for "${drugName}".`;
+
+      const total = data.meta?.results?.total ?? results.length;
+
+      if (reportType === 'adverse_event') {
+        const lines = results.map((r, i) => {
+          const drugs = (r['patient'] as Record<string, unknown>)?.['drug'] as Array<Record<string, unknown>> | undefined;
+          const reactions = (r['patient'] as Record<string, unknown>)?.['reaction'] as Array<Record<string, unknown>> | undefined;
+          const drugNames = (drugs ?? []).slice(0, 3).map((d) => d['medicinalproduct'] as string).filter(Boolean).join(', ');
+          const reactionNames = (reactions ?? []).slice(0, 3).map((rx) => rx['reactionmeddrapt'] as string).filter(Boolean).join(', ');
+          return `**${i + 1}.** Drugs: ${drugNames || 'N/A'}\n  Reactions: ${reactionNames || 'N/A'}`;
+        });
+        return `## OpenFDA Adverse Events — "${drugName}" (${total.toLocaleString()} total)\n\n${lines.join('\n\n')}`;
+      } else {
+        const lines = results.map((r, i) => {
+          const openfda = r['openfda'] as Record<string, string[]> | undefined;
+          const brandName = (openfda?.['brand_name'] ?? [])[0] ?? 'N/A';
+          const genericName = (openfda?.['generic_name'] ?? [])[0] ?? 'N/A';
+          const indications = ((r['indications_and_usage'] as string) || '').slice(0, 200);
+          return `**${i + 1}.** ${brandName} (${genericName})\n  ${indications}...`;
+        });
+        return `## OpenFDA Drug Labels — "${drugName}"\n\n${lines.join('\n\n')}`;
+      }
+    }
+
+    // ── query_reactome ──────────────────────────────────────────────────────
+    case 'query_reactome': {
+      const query = args.query as string;
+      const species = (args.species as string) || 'Homo sapiens';
+      const maxResults = Math.min((args.max_results as number) || 5, 10);
+
+      const searchUrl = `https://reactome.org/ContentService/search/query?query=${encodeURIComponent(query)}&types=Pathway&species=${encodeURIComponent(species)}&cluster=true&Start=0&rows=${maxResults}`;
+      const resp = await fetch(searchUrl, {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!resp.ok) return `Reactome API error: HTTP ${resp.status}`;
+
+      const data = await resp.json() as {
+        results?: Array<{
+          entries?: Array<{
+            stId?: string;
+            name?: string;
+            type?: string;
+            species?: string[];
+            exactType?: string;
+          }>;
+          typeName?: string;
+        }>;
+      };
+
+      const pathways: Array<{ stId: string; name: string }> = [];
+      for (const group of data.results ?? []) {
+        for (const entry of group.entries ?? []) {
+          if (entry.stId && entry.name) {
+            pathways.push({ stId: entry.stId, name: entry.name });
+          }
+        }
+        if (pathways.length >= maxResults) break;
+      }
+
+      if (pathways.length === 0) return `No Reactome pathways found for "${query}" in ${species}.`;
+
+      const lines = pathways.slice(0, maxResults).map((p, i) =>
+        `**${i + 1}.** ${p.name}\n  ID: ${p.stId} | 🔗 https://reactome.org/PathwayBrowser/#/${p.stId}`
+      );
+
+      return `## Reactome Pathways — "${query}" (${species})\n\n${lines.join('\n\n')}`;
     }
 
     default:

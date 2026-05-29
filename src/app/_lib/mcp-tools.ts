@@ -272,6 +272,40 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['query_pubmed', 'query_clinicaltrials'],
   },
+  {
+    name: 'query_fda',
+    displayName: 'query_fda',
+    icon: '💊',
+    group: 'skill',
+    description: 'Search OpenFDA for drug adverse events and labels.',
+    longDescription: 'Queries OpenFDA (FAERS 2000만+ 이상반응 보고, 약물 라벨)으로 약물 안전성 데이터를 검색한다. CandidaX CNS 약물 안전성 조사에 활용.',
+    tags: ['FDA', 'Drug Safety', 'CandidaX'],
+    parameters: [
+      { name: 'drug_name', type: 'string', required: true, description: 'Drug name or active ingredient' },
+      { name: 'report_type', type: 'string', required: false, description: 'adverse_event | label (default: adverse_event)' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
+    ],
+    keyFeatures: ['FAERS 이상반응 데이터', 'Drug label 정보', '인증 불필요'],
+    useCases: ['CNS 약물 안전성 조사', '약물 이상반응 빈도 파악', 'CandidaX 약물 리스크 분석'],
+    relatedTools: ['query_opentargets', 'query_pubmed'],
+  },
+  {
+    name: 'query_reactome',
+    displayName: 'query_reactome',
+    icon: '🔬',
+    group: 'skill',
+    description: 'Search Reactome for curated biological pathways.',
+    longDescription: 'Reactome 인간 큐레이션 경로 DB에서 분자 메커니즘 경로를 검색한다. KEGG 보완 — 반응 수준 상세 경로 제공.',
+    tags: ['Pathways', 'Systems Biology', 'FactorForge'],
+    parameters: [
+      { name: 'query', type: 'string', required: true, description: 'Pathway or molecule keyword' },
+      { name: 'species', type: 'string', required: false, description: 'Species (default: Homo sapiens)' },
+      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
+    ],
+    keyFeatures: ['인간 큐레이션 경로', 'KEGG 보완', '반응 수준 상세'],
+    useCases: ['분자 메커니즘 경로 조사', 'FactorForge 단백질 기능 경로 분석', 'CandidaX 질환 메커니즘'],
+    relatedTools: ['query_kegg', 'query_opentargets'],
+  },
 
   // ── Workflows ─────────────────────────────────────────────────────────
   {
