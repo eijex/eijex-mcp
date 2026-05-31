@@ -31,6 +31,7 @@
 | `query_opentargets` | Search Open Targets for drug targets and disease associations |
 | `query_fda` | Search FDA adverse events and drug labels via OpenFDA |
 | `query_reactome` | Search Reactome for biological pathways and reactions |
+| `query_chembl` | Search ChEMBL for bioactive compounds and drug targets |
 | `get_model_recommendations` | Get AI model recommendations by task type |
 | `get_skill_template` | Get a Claude skill template for a new project domain |
 | `get_operational_prompt_template` | Get reusable operational prompt templates |
