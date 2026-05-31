@@ -52,6 +52,33 @@ const TOOLS = [
     },
   },
   {
+    name: 'factorforge_cds_batch',
+    description: 'Optimize multiple protein sequences in a single request using FactorForge CDS. Accepts up to 20 sequences. Returns CAI, GC%, and optimized CDS for each.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequences: {
+          type: 'array',
+          description: 'Array of sequences to optimize. Each item: { id: string, sequence: string }. Max 20.',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              sequence: { type: 'string' },
+            },
+            required: ['sequence'],
+          },
+        },
+        profile: {
+          type: 'string',
+          description: 'Optimization profile applied to all sequences (default: balanced)',
+          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly', 'ramp', 'viral_delivery', 'ml_enhanced'],
+        },
+      },
+      required: ['sequences'],
+    },
+  },
+  {
     name: 'query_pubmed',
     description: 'Search PubMed for scientific literature. Useful for biotech research, drug discovery, clinical evidence, and domain-specific literature reviews.',
     inputSchema: {
@@ -235,6 +262,9 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       if (!sequence || sequence.trim().length === 0) {
         return 'Error: sequence is required.';
       }
+      if (sequence.trim().length > 2000) {
+        return 'Error: sequence exceeds maximum length of 2000 amino acids.';
+      }
 
       const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
         method: 'POST',
@@ -321,6 +351,69 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       return [
         `## FactorForge CDS Profile Comparison`,
         `Sequence length: ${sequence.trim().length} aa | Host: Nicotiana benthamiana`,
+        '',
+        header,
+        divider,
+        ...rows,
+        '',
+        `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`,
+      ].join('\n');
+    }
+
+    // ── factorforge_cds_batch ─────────────────────────────────────────
+    case 'factorforge_cds_batch': {
+      const sequences = args.sequences as Array<{ id?: string; sequence: string }>;
+      const profile = (args.profile as string) || 'balanced';
+
+      if (!sequences || sequences.length === 0) {
+        return 'Error: sequences array is required.';
+      }
+      if (sequences.length > 20) {
+        return 'Error: maximum 20 sequences per batch request.';
+      }
+      for (const s of sequences) {
+        if (!s.sequence || s.sequence.trim().length === 0) return 'Error: each sequence must be non-empty.';
+        if (s.sequence.trim().length > 2000) return 'Error: each sequence must be 2000 amino acids or fewer.';
+      }
+
+      const payload = {
+        sequences: sequences.map((s, i) => ({
+          id: s.id ?? `seq_${i + 1}`,
+          sequence: s.sequence.trim().toUpperCase(),
+        })),
+        profile,
+      };
+
+      const resp = await fetch('https://factorforge.eijex.com/api/optimize/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(120000),
+      });
+
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => '');
+        return `FactorForge API error: HTTP ${resp.status}\n${errText}`;
+      }
+
+      const data = await resp.json() as {
+        results?: Array<{ id: string; cai?: number; gc_percent?: number; dna?: string; error?: string }>;
+      };
+
+      const results = data.results ?? [];
+      if (results.length === 0) return 'No batch results returned.';
+
+      const header = `| ID | CAI | GC% | Length |`;
+      const divider = `|----|-----|-----|--------|`;
+      const rows = results.map((r) =>
+        r.error
+          ? `| ${r.id} | — | — | Error: ${r.error} |`
+          : `| ${r.id} | ${r.cai?.toFixed(4) ?? 'N/A'} | ${r.gc_percent?.toFixed(1) ?? 'N/A'}% | ${r.dna?.length ?? 'N/A'} nt |`
+      );
+
+      return [
+        `## FactorForge CDS Batch Optimization`,
+        `Profile: ${profile} | Sequences: ${results.length} | Host: Nicotiana benthamiana`,
         '',
         header,
         divider,

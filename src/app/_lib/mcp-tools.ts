@@ -77,6 +77,32 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['factorforge_cds_optimize', 'query_pubmed'],
   },
+  {
+    name: 'factorforge_cds_batch',
+    displayName: 'factorforge_cds_batch',
+    icon: '⚡',
+    group: 'agent',
+    description: 'Optimize up to 20 protein sequences in a single request.',
+    longDescription:
+      'Runs FactorForge CDS optimization on multiple protein sequences in one API call. ' +
+      'Returns CAI, GC%, and optimized DNA for each sequence. ' +
+      'All sequences use the same profile. Maximum 20 sequences per request.',
+    tags: ['FactorForge', 'Biotech', 'DNA'],
+    parameters: [
+      { name: 'sequences', type: 'string', required: true, description: 'Array of { id, sequence } objects (max 20)' },
+      { name: 'profile', type: 'string', required: false, description: 'Profile applied to all sequences (default: balanced)' },
+    ],
+    keyFeatures: [
+      'Up to 20 sequences per call',
+      'CAI, GC%, and optimized CDS per sequence',
+      'Single profile applied to all sequences',
+    ],
+    useCases: [
+      'Optimizing a panel of protein variants',
+      'Batch processing for library design',
+    ],
+    relatedTools: ['factorforge_cds_optimize', 'factorforge_cds_compare'],
+  },
 
   // ── Skills ────────────────────────────────────────────────────────────
   {

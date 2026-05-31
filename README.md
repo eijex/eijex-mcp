@@ -21,6 +21,7 @@
 |------|-------------|
 | `factorforge_cds_optimize` | Generate a codon-optimized CDS for *N. benthamiana* expression |
 | `factorforge_cds_compare` | Compare multiple optimization profiles side-by-side (CAI, GC%, score) |
+| `factorforge_cds_batch` | Optimize up to 20 sequences in a single request |
 | `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |
 | `query_pubmed` | Search PubMed for scientific literature |
 | `query_pdb` | Search RCSB PDB for 3D protein structures |
