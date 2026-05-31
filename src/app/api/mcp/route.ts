@@ -848,7 +848,7 @@ function err(id: unknown, code: number, message: string) {
 export async function GET() {
   return NextResponse.json({
     name: 'eijex-mcp',
-    version: '1.0.0',
+    version: '1.1.0',
     description: 'Eijex MCP Server — Codon optimization + biomedical databases + AI workflow tools',
     transport: 'streamable-http',
     endpoint: '/api/mcp',
@@ -874,7 +874,7 @@ export async function POST(req: NextRequest) {
         return ok(id, {
           protocolVersion: '2024-11-05',
           capabilities: { tools: {} },
-          serverInfo: { name: 'eijex-mcp', version: '1.0.0' },
+          serverInfo: { name: 'eijex-mcp', version: '1.1.0' },
         });
 
       case 'notifications/initialized':
