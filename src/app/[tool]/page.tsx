@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ALL_TOOLS, TOOL_MAP } from '../_lib/mcp-tools';
 import McpToolCard from '../_components/McpToolCard';
 
-const MCP_URL = 'https://eijex-mcp.vercel.app/api/mcp';
+const MCP_URL = 'https://mcp.eijex.com/api/mcp';
 
 export function generateStaticParams() {
   return ALL_TOOLS.map((t) => ({ tool: t.name }));

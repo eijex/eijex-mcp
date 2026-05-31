@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { ALL_TOOLS } from './_lib/mcp-tools';
 import McpToolCard from './_components/McpToolCard';
 
-const MCP_URL = 'https://eijex-mcp.vercel.app/api/mcp';
+const MCP_URL = 'https://mcp.eijex.com/api/mcp';
 
 const CONNECTION_SNIPPET = `{
   "mcpServers": {

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Eijex MCP",
     description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
-    url: "https://eijex-mcp.vercel.app",
+    url: "https://mcp.eijex.com",
     siteName: "Eijex MCP",
     type: "website",
   },
