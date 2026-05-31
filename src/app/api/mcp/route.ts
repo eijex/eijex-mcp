@@ -11,6 +11,23 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// ── Rate limiting (in-memory, per serverless instance) ────────────────
+const RATE_LIMIT = 60;
+const RATE_WINDOW_MS = 60_000;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
 // ── Tool definitions ───────────────────────────────────────────────────
 
 const TOOLS = [
@@ -951,6 +968,11 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ jsonrpc: '2.0', id: null, error: { code: -32000, message: 'Rate limit exceeded. Max 60 requests per minute.' } }, { status: 429 });
+  }
+
   let body: { jsonrpc: string; id?: unknown; method: string; params?: unknown };
 
   try {
