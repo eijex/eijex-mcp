@@ -14,6 +14,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `factorforge_cds_batch` — optimize up to 20 sequences in a single request via `POST /api/optimize/batch`
 - `ml_enhanced` profile added to `factorforge_cds_optimize` enum (FactorForge v3.1.6)
 - Sequence length guardrail: 2000 amino acids maximum per sequence
+- Rate limiting: 60 requests per minute per IP
+- Health endpoint: `GET /api/health`
 
 ### Changed
 - `factorforge_optimize_cds` renamed to `factorforge_cds_optimize` for naming consistency
