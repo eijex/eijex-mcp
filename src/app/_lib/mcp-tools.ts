@@ -36,20 +36,46 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
-      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
+      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery | ml_enhanced' },
     ],
     keyFeatures: [
-      'Rule-based codon optimization for N. benthamiana',
+      'Constraint-based DP feasibility design (v3.1.6)',
       'CAI and GC% metrics',
       'Golden Gate / MoClo compatible domestication',
-      'Multiple optimization profiles',
+      'Multiple optimization profiles including ml_enhanced',
     ],
     useCases: [
       'Plant-based recombinant protein expression',
       'Synthetic gene design for agroinfiltration',
       'Codon optimization for transient expression systems',
     ],
-    relatedTools: ['query_pubmed', 'query_pdb'],
+    relatedTools: ['factorforge_cds_compare', 'query_pubmed', 'query_pdb'],
+  },
+  {
+    name: 'factorforge_cds_compare',
+    displayName: 'factorforge_cds_compare',
+    icon: '📊',
+    group: 'agent',
+    description: 'Compare multiple FactorForge optimization profiles side-by-side.',
+    longDescription:
+      'Runs multiple FactorForge CDS optimization profiles on the same protein sequence in a single call. ' +
+      'Returns a comparison table with CAI, GC%, and composite score for each profile. ' +
+      'Useful for choosing the best profile before committing to a final design.',
+    tags: ['FactorForge', 'Biotech', 'DNA'],
+    parameters: [
+      { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
+      { name: 'profiles', type: 'string', required: false, description: 'Comma-separated profiles (default: balanced,high_cai,gc_target)' },
+    ],
+    keyFeatures: [
+      'Side-by-side profile comparison',
+      'CAI, GC%, composite score per profile',
+      'Single API call for multiple profiles',
+    ],
+    useCases: [
+      'Choosing optimal profile before final CDS design',
+      'Comparing trade-offs between CAI and GC%',
+    ],
+    relatedTools: ['factorforge_optimize_cds', 'query_pubmed'],
   },
 
   // ── Skills ────────────────────────────────────────────────────────────

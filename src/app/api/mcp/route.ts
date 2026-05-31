@@ -16,7 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const TOOLS = [
   {
     name: 'factorforge_optimize_cds',
-    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for expression in Nicotiana benthamiana using FactorForge CDS v3.x. Default uses constraint-based DP feasibility design; profile-based design modes are available when specified.',
+    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for expression in Nicotiana benthamiana using FactorForge CDS v3.1.6. Default uses constraint-based DP feasibility design; profile-based design modes are available when specified.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -26,8 +26,26 @@ const TOOLS = [
         },
         profile: {
           type: 'string',
-          description: 'Optimization profile: balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery (default: balanced)',
-          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly', 'ramp', 'viral_delivery'],
+          description: 'Optimization profile: balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery | ml_enhanced (default: balanced)',
+          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly', 'ramp', 'viral_delivery', 'ml_enhanced'],
+        },
+      },
+      required: ['sequence'],
+    },
+  },
+  {
+    name: 'factorforge_cds_compare',
+    description: 'Compare multiple FactorForge CDS optimization profiles side-by-side for the same protein sequence. Returns CAI, GC%, and composite score for each profile in a single call.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequence: {
+          type: 'string',
+          description: 'Amino acid sequence (single-letter code)',
+        },
+        profiles: {
+          type: 'string',
+          description: 'Comma-separated profiles to compare (e.g. "balanced,high_cai,gc_target"). Default: balanced,high_cai,gc_target',
         },
       },
       required: ['sequence'],
@@ -258,6 +276,58 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         '',
         `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`,
       ].filter((l) => l !== undefined).join('\n').trim();
+    }
+
+    // ── factorforge_cds_compare ───────────────────────────────────────
+    case 'factorforge_cds_compare': {
+      const sequence = args.sequence as string;
+      const profiles = ((args.profiles as string) || 'balanced,high_cai,gc_target').split(',').map((p) => p.trim());
+
+      if (!sequence || sequence.trim().length === 0) {
+        return 'Error: sequence is required.';
+      }
+
+      const resp = await fetch('https://factorforge.eijex.com/api/optimize/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sequence: sequence.trim().toUpperCase(), profiles }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => '');
+        return `FactorForge API error: HTTP ${resp.status}\n${errText}`;
+      }
+
+      const data = await resp.json() as {
+        results?: Array<{
+          profile: string;
+          cai?: number;
+          gc_percent?: number;
+          score?: number;
+          dna?: string;
+        }>;
+      };
+
+      const results = data.results ?? [];
+      if (results.length === 0) return 'No comparison results returned.';
+
+      const header = `| Profile | CAI | GC% | Score |`;
+      const divider = `|---------|-----|-----|-------|`;
+      const rows = results.map((r) =>
+        `| ${r.profile} | ${r.cai?.toFixed(4) ?? 'N/A'} | ${r.gc_percent?.toFixed(1) ?? 'N/A'}% | ${r.score?.toFixed(4) ?? 'N/A'} |`
+      );
+
+      return [
+        `## FactorForge CDS Profile Comparison`,
+        `Sequence length: ${sequence.trim().length} aa | Host: Nicotiana benthamiana`,
+        '',
+        header,
+        divider,
+        ...rows,
+        '',
+        `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`,
+      ].join('\n');
     }
 
     // ── query_pubmed ──────────────────────────────────────────────────
