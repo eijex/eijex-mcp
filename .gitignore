@@ -40,4 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# internal data (not for public repo)
+src/app/_lib/data/session-logs.json
+src/app/_lib/data/snapshots.json
+src/app/_lib/data/briefing-history.json
+src/app/_lib/data/model-guide.json
+src/app/_lib/data/operational-prompts.ts
+src/lib/project-metadata.ts
