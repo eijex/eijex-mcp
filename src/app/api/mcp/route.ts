@@ -218,7 +218,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         return 'Error: sequence is required.';
       }
 
-      const resp = await fetch('https://factorforge-cds.vercel.app/api/optimize', {
+      const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sequence: sequence.trim().toUpperCase(), profile }),
@@ -256,7 +256,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         '```',
         warnings ? `\n${warnings}` : '',
         '',
-        `Powered by [FactorForge CDS](https://factorforge-cds.vercel.app) (AGPL-3.0)`,
+        `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`,
       ].filter((l) => l !== undefined).join('\n').trim();
     }
 

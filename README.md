@@ -45,5 +45,5 @@ FactorForge CDS generates in-silico CDS design candidates. It does not guarantee
 
 ## Related
 
-- [FactorForge CDS](https://factorforge-cds.vercel.app) — Constraint-based CDS design engine for host-specific expression workflows
+- [FactorForge CDS](https://factorforge.eijex.com) — Constraint-based CDS design engine for host-specific expression workflows
 - [mcp.eijex.com](https://mcp.eijex.com) — Web UI
