@@ -61,6 +61,9 @@ export default function Home() {
         <p className="text-zinc-400 text-base mb-8">
           Turns scientific context into validated CDS and construct design artifacts
         </p>
+        <p className="text-xs text-zinc-600 mb-8">
+          For research and in-silico use only. Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to this public endpoint.
+        </p>
 
         {/* Connection snippet */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
