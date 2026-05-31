@@ -9,7 +9,7 @@
   "mcpServers": {
     "eijex": {
       "type": "http",
-      "url": "https://eijex-mcp.vercel.app/api/mcp"
+      "url": "https://mcp.eijex.com/api/mcp"
     }
   }
 }
@@ -46,4 +46,4 @@ FactorForge CDS generates in-silico CDS design candidates. It does not guarantee
 ## Related
 
 - [FactorForge CDS](https://factorforge-cds.vercel.app) — Constraint-based CDS design engine for host-specific expression workflows
-- [eijex-mcp.vercel.app](https://eijex-mcp.vercel.app) — Web UI
+- [mcp.eijex.com](https://mcp.eijex.com) — Web UI
