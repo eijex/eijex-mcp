@@ -24,8 +24,8 @@ export interface McpToolDefinition {
 export const ALL_TOOLS: McpToolDefinition[] = [
   // ── Agents ────────────────────────────────────────────────────────────
   {
-    name: 'factorforge_optimize_cds',
-    displayName: 'factorforge_optimize_cds',
+    name: 'factorforge_cds_optimize',
+    displayName: 'factorforge_cds_optimize',
     icon: '🧬',
     group: 'agent',
     description: 'Optimize a protein sequence into a codon-adapted DNA CDS for N. benthamiana.',
@@ -75,7 +75,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Choosing optimal profile before final CDS design',
       'Comparing trade-offs between CAI and GC%',
     ],
-    relatedTools: ['factorforge_optimize_cds', 'query_pubmed'],
+    relatedTools: ['factorforge_cds_optimize', 'query_pubmed'],
   },
 
   // ── Skills ────────────────────────────────────────────────────────────
@@ -130,7 +130,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Structural analysis for drug design',
       'Protein engineering reference lookup',
     ],
-    relatedTools: ['query_pubmed', 'factorforge_optimize_cds'],
+    relatedTools: ['query_pubmed', 'factorforge_cds_optimize'],
   },
   {
     name: 'query_kegg',
@@ -214,7 +214,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Retrieving accession numbers for downstream analysis',
       'Cross-checking sequence identity before design',
     ],
-    relatedTools: ['query_uniprot', 'factorforge_optimize_cds'],
+    relatedTools: ['query_uniprot', 'factorforge_cds_optimize'],
   },
   {
     name: 'query_uniprot',
@@ -383,7 +383,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Validate CAI cutoff values for N. benthamiana expression',
       'Re-evaluate any FactorForge scoring constant with new evidence',
     ],
-    relatedTools: ['factorforge_optimize_cds', 'query_pubmed', 'query_pdb'],
+    relatedTools: ['factorforge_cds_optimize', 'query_pubmed', 'query_pdb'],
   },
 ];
 

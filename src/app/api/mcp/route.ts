@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const TOOLS = [
   {
-    name: 'factorforge_optimize_cds',
+    name: 'factorforge_cds_optimize',
     description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for expression in Nicotiana benthamiana using FactorForge CDS v3.1.6. Default uses constraint-based DP feasibility design; profile-based design modes are available when specified.',
     inputSchema: {
       type: 'object',
@@ -227,8 +227,8 @@ const TOOLS = [
 async function handleTool(name: string, args: Record<string, unknown>): Promise<string> {
   switch (name) {
 
-    // ── factorforge_optimize_cds ──────────────────────────────────────
-    case 'factorforge_optimize_cds': {
+    // ── factorforge_cds_optimize ──────────────────────────────────────
+    case 'factorforge_cds_optimize': {
       const sequence = args.sequence as string;
       const profile = (args.profile as string) || 'balanced';
 

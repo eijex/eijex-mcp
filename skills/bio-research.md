@@ -13,7 +13,7 @@ description: Use when conducting biotech research with eijex-mcp tools — guide
 5. `query_pubmed(query="<indication> <target>")` → recent literature
 
 ## Plant Codon Optimization
-1. `factorforge_optimize_cds(sequence="...")` → CDS optimization
+1. `factorforge_cds_optimize(sequence="...")` → CDS optimization
 2. `query_pubmed(query="codon optimization N. benthamiana")` → references
 3. `query_kegg(query="plant expression")` → pathway analysis
 
