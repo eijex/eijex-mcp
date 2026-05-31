@@ -13,9 +13,11 @@ description: Use when conducting biotech research with eijex-mcp tools — guide
 5. `query_pubmed(query="<indication> <target>")` → recent literature
 
 ## Plant Codon Optimization
-1. `factorforge_cds_optimize(sequence="...")` → CDS optimization
-2. `query_pubmed(query="codon optimization N. benthamiana")` → references
-3. `query_kegg(query="plant expression")` → pathway analysis
+1. `factorforge_cds_optimize(sequence="...")` → single sequence CDS optimization
+2. `factorforge_cds_compare(sequence="...", profiles="balanced,high_cai,gc_target")` → compare profiles
+3. `factorforge_cds_batch(sequences=[...])` → optimize multiple sequences at once (max 20)
+4. `query_pubmed(query="codon optimization N. benthamiana")` → references
+5. `query_kegg(query="plant expression")` → pathway analysis
 
 ## Pathway Analysis (supplementary)
 - KEGG: pathway overview
