@@ -330,15 +330,15 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     icon: '💊',
     group: 'skill',
     description: 'Search OpenFDA for drug adverse events and labels.',
-    longDescription: 'Queries OpenFDA (FAERS 2000만+ 이상반응 보고, 약물 라벨)으로 약물 안전성 데이터를 검색한다. CandidaX CNS 약물 안전성 조사에 활용.',
-    tags: ['FDA', 'Drug Safety', 'CandidaX'],
+    longDescription: 'Queries OpenFDA (FAERS 20M+ adverse event reports, drug labels) for drug safety data.',
+    tags: ['FDA', 'Drug Safety', 'Biotech'],
     parameters: [
       { name: 'drug_name', type: 'string', required: true, description: 'Drug name or active ingredient' },
       { name: 'report_type', type: 'string', required: false, description: 'adverse_event | label (default: adverse_event)' },
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
     ],
-    keyFeatures: ['FAERS 이상반응 데이터', 'Drug label 정보', '인증 불필요'],
-    useCases: ['CNS 약물 안전성 조사', '약물 이상반응 빈도 파악', 'CandidaX 약물 리스크 분석'],
+    keyFeatures: ['FAERS adverse event data', 'Drug label information', 'No authentication required'],
+    useCases: ['Drug safety research', 'Adverse event frequency analysis', 'Pharmacovigilance'],
     relatedTools: ['query_opentargets', 'query_pubmed'],
   },
   {
@@ -355,7 +355,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
     ],
     keyFeatures: ['인간 큐레이션 경로', 'KEGG 보완', '반응 수준 상세'],
-    useCases: ['분자 메커니즘 경로 조사', 'FactorForge 단백질 기능 경로 분석', 'CandidaX 질환 메커니즘'],
+    useCases: ['Molecular mechanism pathway analysis', 'Protein function pathway analysis', 'Disease mechanism research'],
     relatedTools: ['query_kegg', 'query_opentargets'],
   },
   {
@@ -367,8 +367,8 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     longDescription:
       'Queries the ChEMBL database for protein targets, small molecule compounds, and bioactivity data. ' +
       'Supports target search, compound search, and bioactivity lookup by ChEMBL target ID. ' +
-      'Useful for CandidaX AQP4 inhibitor screening and CNS drug discovery.',
-    tags: ['ChEMBL', 'Drug Discovery', 'Compound', 'Bioactivity', 'CandidaX'],
+      'Useful for target validation, compound screening, and drug discovery research.',
+    tags: ['ChEMBL', 'Drug Discovery', 'Compound', 'Bioactivity'],
     parameters: [
       { name: 'query', type: 'string', required: true, description: 'Target name or compound keyword' },
       { name: 'search_type', type: 'string', required: false, description: 'target | compound | activity' },
