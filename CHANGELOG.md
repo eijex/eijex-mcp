@@ -7,6 +7,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Changed
+- `factorforge_cds_optimize` description updated to FactorForge CDS v3.1.8; added BY-2 host note
+- ⚠ `gc_target` profile now targets ~60% GC by default (breaking change from v3.1.7); pass `target_gc=42.5` for old behavior
+
+---
+
 ## [1.1.0] — 2026-05-31
 
 ### Added
