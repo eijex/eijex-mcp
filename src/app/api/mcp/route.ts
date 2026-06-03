@@ -43,8 +43,8 @@ const TOOLS = [
         },
         profile: {
           type: 'string',
-          description: 'Optimization profile: balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery | ml_enhanced (default: balanced)',
-          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly', 'ramp', 'viral_delivery', 'ml_enhanced'],
+          description: 'Optimization profile: balanced | high_cai | gc_target | assembly_friendly (default: balanced)',
+          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly'],
         },
       },
       required: ['sequence'],
@@ -89,7 +89,7 @@ const TOOLS = [
         profile: {
           type: 'string',
           description: 'Optimization profile applied to all sequences (default: balanced)',
-          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly', 'ramp', 'viral_delivery', 'ml_enhanced'],
+          enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly'],
         },
       },
       required: ['sequences'],

@@ -36,13 +36,13 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
-      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly | ramp | viral_delivery | ml_enhanced' },
+      { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
     ],
     keyFeatures: [
       'Constraint-based DP feasibility design (v3.1.6)',
       'CAI and GC% metrics',
       'Golden Gate / MoClo compatible domestication',
-      'Multiple optimization profiles including ml_enhanced',
+      'Multiple optimization profiles (balanced, high_cai, gc_target, assembly_friendly)',
     ],
     useCases: [
       'Plant-based recombinant protein expression',
