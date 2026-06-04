@@ -9,9 +9,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **Profile enum** — `factorforge_cds_optimize` and batch route now expose only the 4 API-validated profiles (`balanced`, `high_cai`, `gc_target`, `assembly_friendly`); `ramp`, `viral_delivery`, and `ml_enhanced` removed from enum (were causing live HTTP 400 errors).
+
 ### Changed
-- `factorforge_cds_optimize` description updated to FactorForge CDS v3.1.8; added BY-2 host note
-- ⚠ `gc_target` profile now targets ~60% GC by default (breaking change from v3.1.7); pass `target_gc=42.5` for old behavior
+- `factorforge_cds_optimize` description updated to FactorForge v3.1.9.
+- ⚠ `gc_target` profile now targets ~60% GC by default (breaking change from v3.1.7); pass `target_gc=42.5` for old behavior.
 
 ---
 

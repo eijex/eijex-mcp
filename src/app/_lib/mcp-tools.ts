@@ -347,14 +347,17 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     icon: '🔬',
     group: 'skill',
     description: 'Search Reactome for curated biological pathways.',
-    longDescription: 'Reactome 인간 큐레이션 경로 DB에서 분자 메커니즘 경로를 검색한다. KEGG 보완 — 반응 수준 상세 경로 제공.',
-    tags: ['Pathways', 'Systems Biology', 'FactorForge'],
+    longDescription:
+      'Searches the Reactome human-curated pathway database for molecular mechanism pathways. ' +
+      'Complements KEGG by providing reaction-level pathway detail. ' +
+      'Useful for molecular mechanism analysis and disease pathway research.',
+    tags: ['Pathways', 'Systems Biology', 'Biotech'],
     parameters: [
       { name: 'query', type: 'string', required: true, description: 'Pathway or molecule keyword' },
       { name: 'species', type: 'string', required: false, description: 'Species (default: Homo sapiens)' },
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
     ],
-    keyFeatures: ['인간 큐레이션 경로', 'KEGG 보완', '반응 수준 상세'],
+    keyFeatures: ['Human-curated pathways', 'Reaction-level detail', 'Complements KEGG'],
     useCases: ['Molecular mechanism pathway analysis', 'Protein function pathway analysis', 'Disease mechanism research'],
     relatedTools: ['query_kegg', 'query_opentargets'],
   },
@@ -376,7 +379,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       { name: 'max_results', type: 'number', required: false, description: 'Max results (default: 5)' },
     ],
     keyFeatures: ['Target search', 'Compound screening', 'Bioactivity data', 'Drug discovery'],
-    useCases: ['AQP4 inhibitor search', 'CNS compound screening', 'Target validation'],
+    useCases: ['Small molecule inhibitor search', 'Compound bioactivity lookup', 'Drug target validation'],
     relatedTools: ['query_opentargets', 'query_pubmed'],
   },
 
