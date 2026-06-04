@@ -33,7 +33,7 @@ function checkRateLimit(ip: string): boolean {
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for plant expression using FactorForge CDS v3.1.8. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Default uses constraint-based DP feasibility design; profile-based design modes are available when specified. Note: gc_target profile now targets ~60% GC by default (breaking change from v3.1.7).',
+    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for plant expression using FactorForge CDS v3.1.9. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Default uses constraint-based DP feasibility design; profile-based design modes are available when specified. Note: gc_target profile now targets ~60% GC by default (breaking change from v3.1.7).',
     inputSchema: {
       type: 'object',
       properties: {
