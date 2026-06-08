@@ -1,6 +1,6 @@
 ---
 name: eijex-bio-research
-description: Use when conducting biotech research with eijex-mcp tools — guides tool selection order for autoimmune disease research and plant codon optimization workflows
+description: Use when conducting biotech research with eijex-mcp tools — guides tool selection order for database lookup and plant CDS design workflows
 ---
 
 # eijex Bio-Research Workflow
@@ -12,12 +12,12 @@ description: Use when conducting biotech research with eijex-mcp tools — guide
 4. `query_clinicaltrials(query="<indication>")` → active trials
 5. `query_pubmed(query="<indication> <target>")` → recent literature
 
-## Plant Codon Optimization
-1. `factorforge_cds_optimize(sequence="...")` → single sequence CDS optimization
+## Plant CDS Design
+1. `factorforge_cds_optimize(sequence="...")` → single-sequence CDS candidate generation
 2. `factorforge_cds_compare(sequence="...", profiles="balanced,high_cai,gc_target")` → compare profiles
-3. `factorforge_cds_batch(sequences=[...])` → optimize multiple sequences at once (max 20)
-4. `query_pubmed(query="codon optimization N. benthamiana")` → references
-5. `query_kegg(query="plant expression")` → pathway analysis
+3. `factorforge_cds_batch(sequences=[...])` → generate candidates for multiple sequences at once (max 20)
+4. `query_pubmed(query="codon usage N. benthamiana CDS design")` → references
+5. `query_kegg(query="plant codon usage")` → pathway context
 
 ## Pathway Analysis (supplementary)
 - KEGG: pathway overview

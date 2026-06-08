@@ -28,11 +28,11 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'factorforge_cds_optimize',
     icon: '🧬',
     group: 'agent',
-    description: 'Optimize a protein sequence into a codon-adapted DNA CDS for N. benthamiana.',
+    description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
-      'Converts an amino acid sequence into an optimized coding DNA sequence (CDS) for expression in Nicotiana benthamiana. ' +
-      'Uses the FactorForge v3.1.9 stable design path: DP feasibility design, profile-based rule scanning, Golden Gate domestication, and output. ' +
-      'Returns CAI score, GC%, and the optimized DNA sequence.',
+      'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
+      'Uses the FactorForge v3.1.9 stable design path: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
+      'Returns CAI score, GC%, and the designed DNA sequence.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
@@ -41,13 +41,13 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     keyFeatures: [
       'Constraint-based DP feasibility design (v3.1.9)',
       'CAI and GC% metrics',
-      'Golden Gate / MoClo compatible domestication',
-      'Multiple optimization profiles (balanced, high_cai, gc_target, assembly_friendly)',
+      'Golden Gate / MoClo-oriented Type IIS site review',
+      'Multiple public design profiles (balanced, high_cai, gc_target, assembly_friendly)',
     ],
     useCases: [
-      'Plant-based recombinant protein expression',
-      'Synthetic gene design for agroinfiltration',
-      'Codon optimization for transient expression systems',
+      'Plant CDS design review',
+      'Agroinfiltration-oriented sequence review',
+      'Synonymous CDS candidate generation',
     ],
     relatedTools: ['factorforge_cds_compare', 'query_pubmed', 'query_pdb'],
   },
@@ -56,11 +56,11 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'factorforge_cds_compare',
     icon: '📊',
     group: 'agent',
-    description: 'Compare multiple FactorForge optimization profiles side-by-side.',
+    description: 'Compare multiple FactorForge CDS design profiles side-by-side.',
     longDescription:
-      'Runs multiple FactorForge CDS optimization profiles on the same protein sequence in a single call. ' +
+      'Runs multiple public FactorForge CDS design profiles on the same protein sequence in a single call. ' +
       'Returns a comparison table with CAI, GC%, and composite score for each profile. ' +
-      'Useful for choosing the best profile before committing to a final design.',
+      'Useful for reviewing metric trade-offs before selecting a candidate design.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
@@ -72,7 +72,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Single API call for multiple profiles',
     ],
     useCases: [
-      'Choosing optimal profile before final CDS design',
+      'Reviewing public profile trade-offs before final CDS design',
       'Comparing trade-offs between CAI and GC%',
     ],
     relatedTools: ['factorforge_cds_optimize', 'query_pubmed'],
@@ -82,10 +82,10 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'factorforge_cds_batch',
     icon: '⚡',
     group: 'agent',
-    description: 'Optimize up to 20 protein sequences in a single request.',
+    description: 'Generate CDS candidates for up to 20 protein sequences in a single request.',
     longDescription:
-      'Runs FactorForge CDS optimization on multiple protein sequences in one API call. ' +
-      'Returns CAI, GC%, and optimized DNA for each sequence. ' +
+      'Runs FactorForge CDS design on multiple protein sequences in one API call. ' +
+      'Returns CAI, GC%, and designed DNA for each sequence. ' +
       'All sequences use the same profile. Maximum 20 sequences per request.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
@@ -94,11 +94,11 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     keyFeatures: [
       'Up to 20 sequences per call',
-      'CAI, GC%, and optimized CDS per sequence',
+      'CAI, GC%, and designed CDS per sequence',
       'Single profile applied to all sequences',
     ],
     useCases: [
-      'Optimizing a panel of protein variants',
+      'Reviewing a panel of protein variants',
       'Batch processing for library design',
     ],
     relatedTools: ['factorforge_cds_optimize', 'factorforge_cds_compare'],
@@ -223,7 +223,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     longDescription:
       'Searches NCBI via E-utilities and returns accession numbers, organism, and sequence length. ' +
       'Supports protein and nucleotide databases. ' +
-      'Useful for finding reference sequences before codon optimization.',
+      'Useful for finding reference sequences before CDS design review.',
     tags: ['Sequence', 'NCBI', 'Biotech'],
     parameters: [
       { name: 'query', type: 'string', required: true, description: 'Gene/protein name or accession (e.g. "GFP Aequorea victoria")' },
@@ -236,7 +236,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Supports protein and nucleotide databases',
     ],
     useCases: [
-      'Finding reference protein sequences for codon optimization',
+      'Finding reference protein sequences for CDS design review',
       'Retrieving accession numbers for downstream analysis',
       'Cross-checking sequence identity before design',
     ],
@@ -409,7 +409,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     useCases: [
       'Verify GC% thresholds against published literature',
-      'Validate CAI cutoff values for N. benthamiana expression',
+      'Review CAI cutoff values for N. benthamiana CDS design',
       'Re-evaluate any FactorForge scoring constant with new evidence',
     ],
     relatedTools: ['factorforge_cds_optimize', 'query_pubmed', 'query_pdb'],

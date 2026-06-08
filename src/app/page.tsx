@@ -17,7 +17,7 @@ const SECTIONS = [
   {
     key: 'agent' as const,
     label: 'Agents',
-    description: 'Execute design tasks — call external engines and return validated artifacts.',
+    description: 'Run in-silico design and lookup tools with explicit public boundaries.',
   },
   {
     key: 'skill' as const,
@@ -59,7 +59,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="text-zinc-400 text-base mb-8">
-          Turns scientific context into validated CDS and construct design artifacts
+          Turns scientific context into reviewable CDS candidates and lookup results
         </p>
         <p className="text-xs text-zinc-600 mb-8">
           For research and in-silico use only. Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to this public endpoint.
@@ -68,7 +68,7 @@ export default function Home() {
         {/* Connection snippet */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-900/50">
-            <span className="text-xs font-mono text-zinc-500">Connection — .mcp.json / Claude Code settings</span>
+            <span className="text-xs font-mono text-zinc-500">Connection — MCP client settings</span>
             <span className="text-xs text-zinc-600">JSON</span>
           </div>
           <pre className="px-4 py-3 text-xs font-mono text-zinc-300 overflow-x-auto leading-relaxed">

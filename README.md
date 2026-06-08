@@ -1,6 +1,6 @@
 # Eijex MCP
 
-**Eijex MCP** is a public Model Context Protocol server that exposes Eijex bio-AI workflow tools to Claude Code and other MCP-compatible clients.
+**Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics and CDS-design tools to MCP-compatible clients.
 
 ## Connect
 
@@ -19,9 +19,9 @@
 
 | Tool | Description |
 |------|-------------|
-| `factorforge_cds_optimize` | Generate a codon-optimized CDS for *N. benthamiana* expression |
-| `factorforge_cds_compare` | Compare multiple optimization profiles side-by-side (CAI, GC%, score) |
-| `factorforge_cds_batch` | Optimize up to 20 sequences in a single request |
+| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate and sequence metrics |
+| `factorforge_cds_compare` | Compare multiple public CDS design profiles side-by-side (CAI, GC%, score) |
+| `factorforge_cds_batch` | Generate CDS candidates for up to 20 sequences in a single request |
 | `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |
 | `query_pubmed` | Search PubMed for scientific literature |
 | `query_pdb` | Search RCSB PDB for 3D protein structures |
@@ -35,7 +35,7 @@
 | `query_reactome` | Search Reactome for biological pathways and reactions |
 | `query_chembl` | Search ChEMBL for bioactive compounds and drug targets |
 | `get_model_recommendations` | Get AI model recommendations by task type |
-| `get_skill_template` | Get a Claude skill template for a new project domain |
+| `get_skill_template` | Get a reusable skill template for a new project domain |
 | `get_operational_prompt_template` | Get reusable operational prompt templates |
 
 ## Safety & Privacy
@@ -48,5 +48,5 @@ FactorForge CDS generates in-silico CDS design candidates. It does not guarantee
 
 ## Related
 
-- [FactorForge CDS](https://factorforge.eijex.com) — Constraint-based CDS design engine for host-specific expression workflows
+- [FactorForge CDS](https://factorforge.eijex.com) — Constraint-based CDS design engine for plant CDS design workflows
 - [mcp.eijex.com](https://mcp.eijex.com) — Web UI

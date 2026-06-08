@@ -2,7 +2,7 @@
  * Eijex MCP Server
  * Protocol: JSON-RPC 2.0 over HTTP (Streamable HTTP transport)
  *
- * Connect from Claude Code (.mcp.json):
+ * Connect from an MCP client (.mcp.json):
  *   { "mcpServers": { "eijex": { "type": "http", "url": "https://mcp.eijex.com/api/mcp" } } }
  *
  * Connect from VSCode Copilot (settings.json):
@@ -33,7 +33,7 @@ function checkRateLimit(ip: string): boolean {
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Optimize a protein sequence into a codon-adapted DNA coding sequence (CDS) for plant expression using FactorForge CDS v3.1.9. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Default uses constraint-based DP feasibility design; profile-based design modes are available when specified. Note: gc_target profile now targets ~60% GC by default (breaking change from v3.1.7).',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.1.9. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Returns sequence-level metrics and rule-scan output; wet-lab validation is required.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -43,7 +43,7 @@ const TOOLS = [
         },
         profile: {
           type: 'string',
-          description: 'Optimization profile: balanced | high_cai | gc_target | assembly_friendly (default: balanced)',
+          description: 'Public design profile: balanced | high_cai | gc_target | assembly_friendly (default: balanced)',
           enum: ['balanced', 'high_cai', 'gc_target', 'assembly_friendly'],
         },
       },
@@ -52,7 +52,7 @@ const TOOLS = [
   },
   {
     name: 'factorforge_cds_compare',
-    description: 'Compare multiple FactorForge CDS optimization profiles side-by-side for the same protein sequence. Returns CAI, GC%, and composite score for each profile in a single call.',
+    description: 'Compare multiple public FactorForge CDS design profiles side-by-side for the same protein sequence. Returns CAI, GC%, and composite score for each profile in a single call.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -70,13 +70,13 @@ const TOOLS = [
   },
   {
     name: 'factorforge_cds_batch',
-    description: 'Optimize multiple protein sequences in a single request using FactorForge CDS. Accepts up to 20 sequences. Returns CAI, GC%, and optimized CDS for each.',
+    description: 'Generate in-silico CDS candidates for multiple protein sequences in a single request using FactorForge CDS. Accepts up to 20 sequences. Returns CAI, GC%, and designed CDS for each.',
     inputSchema: {
       type: 'object',
       properties: {
         sequences: {
           type: 'array',
-          description: 'Array of sequences to optimize. Each item: { id: string, sequence: string }. Max 20.',
+          description: 'Array of protein sequences to process. Each item: { id: string, sequence: string }. Max 20.',
           items: {
             type: 'object',
             properties: {
@@ -101,7 +101,7 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Search keywords (e.g. "codon optimization Nicotiana benthamiana")' },
+        query: { type: 'string', description: 'Search keywords (e.g. "codon usage Nicotiana benthamiana")' },
         max_results: { type: 'number', description: 'Maximum number of results (default: 5, max: 10)' },
       },
       required: ['query'],
@@ -315,7 +315,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         `- GC%: ${m.gc_percent?.toFixed(1) ?? 'N/A'}% (target 55–65%)`,
         `- Length: ${m.length ?? dna.length} nt`,
         '',
-        `**Optimized DNA (5'→3')**`,
+        `**Designed DNA (5'→3')**`,
         '```',
         dna || '(no sequence returned)',
         '```',
@@ -575,10 +575,10 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       const hypothesis = (args.hypothesis as string) || '';
       const extraKeywords = (args.keywords as string) || '';
 
-      const baseKeywords = `${param.replace(/_/g, ' ').toLowerCase()} codon optimization Nicotiana benthamiana`;
+      const baseKeywords = `${param.replace(/_/g, ' ').toLowerCase()} codon usage Nicotiana benthamiana CDS`;
       const searchTerms = [
         `"${baseKeywords}"`,
-        `"GC content plant transient expression CDS"`,
+        `"GC content plant CDS design"`,
         `"codon usage ${extraKeywords || 'N. benthamiana recombinant protein'}"`,
       ];
 
@@ -592,7 +592,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         `---`,
         ``,
         `### STEP 0 — Question Definition`,
-        `What is the evidence-based optimal value for \`${param}\` in FactorForge CDS optimization?`,
+        `What is the evidence-supported review range for \`${param}\` in FactorForge CDS design?`,
         `Is the current value **${currentValue}** supported by published literature?`,
         ``,
         `### STEP 1 — Literature Search`,
@@ -600,10 +600,10 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         ...searchTerms.map((t) => `- ${t}`),
         ``,
         `### STEP 2 — Structural Reference`,
-        `Run with \`query_pdb\`: \`"plant codon optimized gene expression"\``,
+        `Run with \`query_pdb\`: \`"plant codon usage CDS design"\``,
         ``,
         `### STEP 3 — Pathway Context`,
-        `Run with \`query_kegg\`: \`"plant gene expression"\` (organism: nta = N. tabacum proxy)`,
+        `Run with \`query_kegg\`: \`"plant codon usage"\` (organism: nta = N. tabacum proxy)`,
         ``,
         `> ⛔ **GATE 3.5 — Literature Review Decision**`,
         `> Collect PMIDs from Steps 1–3. Record the reported value range.`,
@@ -959,7 +959,7 @@ export async function GET() {
   return NextResponse.json({
     name: 'eijex-mcp',
     version: '1.2.0',
-    description: 'Eijex MCP Server — Codon optimization + biomedical databases + AI workflow tools',
+    description: 'Eijex MCP Server — CDS design, bioinformatics lookup, and structured workflow tools',
     transport: 'streamable-http',
     endpoint: '/api/mcp',
     tools: TOOLS.length,

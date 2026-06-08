@@ -168,7 +168,7 @@ export default async function ToolPage({ params }: { params: Promise<{ tool: str
           </h2>
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-900/50">
-              <span className="text-xs font-mono text-zinc-500">.mcp.json / Claude Code settings</span>
+              <span className="text-xs font-mono text-zinc-500">.mcp.json / MCP client settings</span>
               <span className="text-xs text-zinc-600">JSON</span>
             </div>
             <pre className="px-4 py-3 text-xs font-mono text-zinc-300 overflow-x-auto leading-relaxed">

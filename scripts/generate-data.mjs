@@ -179,6 +179,7 @@ const data = {
   specs,
 };
 
+fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
 fs.writeFileSync(OUTPUT, JSON.stringify(data, null, 2), 'utf-8');
 console.log(`[generate-data] Output written to: ${OUTPUT}`);
 

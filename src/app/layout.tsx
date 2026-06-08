@@ -11,10 +11,10 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Eijex MCP",
-  description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+  description: "Public MCP access for FactorForge CDS design and bioinformatics lookup tools",
   openGraph: {
     title: "Eijex MCP",
-    description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+    description: "Public MCP access for FactorForge CDS design and bioinformatics lookup tools",
     url: "https://mcp.eijex.com",
     siteName: "Eijex MCP",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "Eijex MCP",
-    description: "BioDesign execution layer for AI agents — FactorForge CDS and bio-AI workflow tools",
+    description: "Public MCP access for FactorForge CDS design and bioinformatics lookup tools",
   },
 };
 

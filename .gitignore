@@ -40,7 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# internal data (not for public repo)
+# generated local data
+src/app/_lib/data/generated.json
 src/app/_lib/data/session-logs.json
 src/app/_lib/data/snapshots.json
 src/app/_lib/data/briefing-history.json

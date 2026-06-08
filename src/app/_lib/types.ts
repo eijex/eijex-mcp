@@ -23,7 +23,7 @@ export interface ProjectDefinition {
   referencesDomain?: string;
 }
 
-export type IdeTarget = 'claude-code' | 'vscode' | 'cursor' | 'other';
+export type IdeTarget = 'mcp-client' | 'vscode' | 'cursor' | 'other';
 export type TokenLevel = 'low' | 'medium' | 'high';
 
 export interface ProjectSnapshot {
