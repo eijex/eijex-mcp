@@ -33,7 +33,7 @@ function checkRateLimit(ip: string): boolean {
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.1.9. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Returns sequence-level metrics and rule-scan output; wet-lab validation is required.',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.2.0. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Returns sequence-level metrics and rule-scan output; wet-lab validation is required.',
     inputSchema: {
       type: 'object',
       properties: {
