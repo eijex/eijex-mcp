@@ -129,7 +129,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Finding clinical evidence for a biomarker',
       'Tracking recent papers on a research topic',
     ],
-    relatedTools: ['query_clinicaltrials', 'query_kegg'],
+    relatedTools: ['query_kegg'],
   },
   {
     name: 'query_pdb',
@@ -183,37 +183,8 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Drug target pathway mapping',
       'Systems biology analysis',
     ],
-    relatedTools: ['query_pubmed', 'query_clinicaltrials'],
+    relatedTools: ['query_pubmed'],
   },
-  {
-    name: 'query_clinicaltrials',
-    displayName: 'query_clinicaltrials',
-    icon: '🏥',
-    group: 'skill',
-    description: 'Search ClinicalTrials.gov for registered clinical trials.',
-    longDescription:
-      'Searches ClinicalTrials.gov v2 API for clinical trials by keyword and status. ' +
-      'Returns trial ID, title, status, phase, conditions, and start date. ' +
-      'Useful for competitive intelligence, trial design, and patient eligibility.',
-    tags: ['Clinical', 'Trials', 'Research'],
-    parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Search keywords (e.g. "type 2 diabetes GLP-1")' },
-      { name: 'status', type: 'string', required: false, description: 'RECRUITING | ACTIVE_NOT_RECRUITING | COMPLETED' },
-      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5)' },
-    ],
-    keyFeatures: [
-      'ClinicalTrials.gov API v2',
-      'Status filtering (recruiting, completed, etc.)',
-      'Returns NCT ID, phase, conditions, timeline',
-    ],
-    useCases: [
-      'Competitive intelligence for a drug target',
-      'Finding recruiting trials for a condition',
-      'Trial design reference lookup',
-    ],
-    relatedTools: ['query_pubmed', 'query_kegg'],
-  },
-
   {
     name: 'query_ncbi',
     displayName: 'query_ncbi',
@@ -296,93 +267,6 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['query_uniprot', 'query_pdb'],
   },
-  {
-    name: 'query_opentargets',
-    displayName: 'query_opentargets',
-    icon: '🎯',
-    group: 'skill',
-    description: 'Search Open Targets Platform for gene targets or diseases and their associations.',
-    longDescription:
-      'Searches the Open Targets Platform via GraphQL API for target genes or diseases. ' +
-      'Returns Ensembl IDs, names, and descriptions. ' +
-      'Useful for target identification, disease association lookup, and drug target prioritization.',
-    tags: ['Target', 'Disease', 'Biotech'],
-    parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Gene symbol or disease name (e.g. "EGFR", "Parkinson disease")' },
-      { name: 'entity', type: 'string', required: false, description: 'target | disease (default: target)' },
-      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
-    ],
-    keyFeatures: [
-      'Open Targets GraphQL API — free, no key required',
-      'Search targets (Ensembl ID) or diseases (EFO ID)',
-      'Returns name, description, and platform link',
-    ],
-    useCases: [
-      'Target identification and prioritization',
-      'Disease-gene association lookup',
-      'Drug target landscape mapping',
-    ],
-    relatedTools: ['query_pubmed', 'query_clinicaltrials'],
-  },
-  {
-    name: 'query_fda',
-    displayName: 'query_fda',
-    icon: '💊',
-    group: 'skill',
-    description: 'Search OpenFDA for drug adverse events and labels.',
-    longDescription: 'Queries OpenFDA (FAERS 20M+ adverse event reports, drug labels) for drug safety data.',
-    tags: ['FDA', 'Drug Safety', 'Biotech'],
-    parameters: [
-      { name: 'drug_name', type: 'string', required: true, description: 'Drug name or active ingredient' },
-      { name: 'report_type', type: 'string', required: false, description: 'adverse_event | label (default: adverse_event)' },
-      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
-    ],
-    keyFeatures: ['FAERS adverse event data', 'Drug label information', 'No authentication required'],
-    useCases: ['Drug safety research', 'Adverse event frequency analysis', 'Pharmacovigilance'],
-    relatedTools: ['query_opentargets', 'query_pubmed'],
-  },
-  {
-    name: 'query_reactome',
-    displayName: 'query_reactome',
-    icon: '🔬',
-    group: 'skill',
-    description: 'Search Reactome for curated biological pathways.',
-    longDescription:
-      'Searches the Reactome human-curated pathway database for molecular mechanism pathways. ' +
-      'Complements KEGG by providing reaction-level pathway detail. ' +
-      'Useful for molecular mechanism analysis and disease pathway research.',
-    tags: ['Pathways', 'Systems Biology', 'Biotech'],
-    parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Pathway or molecule keyword' },
-      { name: 'species', type: 'string', required: false, description: 'Species (default: Homo sapiens)' },
-      { name: 'max_results', type: 'number', required: false, description: 'Max results (default 5, max 10)' },
-    ],
-    keyFeatures: ['Human-curated pathways', 'Reaction-level detail', 'Complements KEGG'],
-    useCases: ['Molecular mechanism pathway analysis', 'Protein function pathway analysis', 'Disease mechanism research'],
-    relatedTools: ['query_kegg', 'query_opentargets'],
-  },
-  {
-    name: 'query_chembl',
-    displayName: 'query_chembl',
-    icon: '💊',
-    group: 'skill' as McpToolGroup,
-    description: 'Search ChEMBL for bioactive compounds and drug targets.',
-    longDescription:
-      'Queries the ChEMBL database for protein targets, small molecule compounds, and bioactivity data. ' +
-      'Supports target search, compound search, and bioactivity lookup by ChEMBL target ID. ' +
-      'Useful for target validation, compound screening, and drug discovery research.',
-    tags: ['ChEMBL', 'Drug Discovery', 'Compound', 'Bioactivity'],
-    parameters: [
-      { name: 'query', type: 'string', required: true, description: 'Target name or compound keyword' },
-      { name: 'search_type', type: 'string', required: false, description: 'target | compound | activity' },
-      { name: 'chembl_id', type: 'string', required: false, description: 'ChEMBL target ID for activity search' },
-      { name: 'max_results', type: 'number', required: false, description: 'Max results (default: 5)' },
-    ],
-    keyFeatures: ['Target search', 'Compound screening', 'Bioactivity data', 'Drug discovery'],
-    useCases: ['Small molecule inhibitor search', 'Compound bioactivity lookup', 'Drug target validation'],
-    relatedTools: ['query_opentargets', 'query_pubmed'],
-  },
-
   // ── Workflows ─────────────────────────────────────────────────────────
   {
     name: 'factorforge_verify_parameter',

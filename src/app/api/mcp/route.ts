@@ -132,19 +132,6 @@ const TOOLS = [
     },
   },
   {
-    name: 'query_clinicaltrials',
-    description: 'Search ClinicalTrials.gov for registered clinical trials. Useful for competitive intelligence, trial design, and patient eligibility research.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'Search keywords (e.g. "type 2 diabetes GLP-1", "Alzheimer tau immunotherapy")' },
-        status: { type: 'string', description: 'Trial status filter: RECRUITING | ACTIVE_NOT_RECRUITING | COMPLETED (optional)' },
-        max_results: { type: 'number', description: 'Maximum number of trials (default: 5)' },
-      },
-      required: ['query'],
-    },
-  },
-  {
     name: 'factorforge_verify_parameter',
     description: 'Initialize a structured 0→7 step research workflow to verify or update a FactorForge design constant (e.g. GC_OPT_MIN, CAI_THRESHOLD). Returns a ready-to-execute research plan with pre-filled PubMed queries and decision gates.',
     inputSchema: {
@@ -205,63 +192,6 @@ const TOOLS = [
         uniprot_accession: { type: 'string', description: 'UniProt accession (e.g. "P42212"). Use query_uniprot first to find the accession.' },
       },
       required: ['uniprot_accession'],
-    },
-  },
-  {
-    name: 'query_opentargets',
-    description: 'Search Open Targets Platform for gene targets or diseases and their associations.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'Gene symbol or disease name (e.g. "EGFR", "Parkinson disease")' },
-        entity: { type: 'string', description: 'Search entity: target | disease (default: target)', enum: ['target', 'disease'] },
-        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
-      },
-      required: ['query'],
-    },
-  },
-  {
-    name: 'query_fda',
-    description: 'Search OpenFDA for drug adverse events, drug labels, or medical device reports. Useful for drug safety research, pharmacovigilance, and regulatory intelligence.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        drug_name: { type: 'string', description: 'Drug name or active ingredient (e.g. "aspirin", "ibuprofen")' },
-        report_type: { type: 'string', description: 'Report type: adverse_event | label (default: adverse_event)', enum: ['adverse_event', 'label'] },
-        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
-      },
-      required: ['drug_name'],
-    },
-  },
-  {
-    name: 'query_reactome',
-    description: 'Search Reactome for biological pathways. Returns pathway names, stable IDs, and hierarchy. Complements KEGG with human-curated reaction-level detail.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'Pathway or molecule keyword (e.g. "AQP4", "neuroinflammation", "codon")' },
-        species: { type: 'string', description: 'Species filter (default: "Homo sapiens")' },
-        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
-      },
-      required: ['query'],
-    },
-  },
-  {
-    name: 'query_chembl',
-    description: 'Search ChEMBL for bioactive compounds, drug targets, and bioactivity data. Useful for drug discovery, target validation, and compound screening.',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'Target name or compound keyword (e.g. "AQP4", "aquaporin-4")' },
-        search_type: {
-          type: 'string',
-          description: 'target = find protein targets | compound = find small molecules | activity = get bioactivity data for a known ChEMBL target ID (default: target)',
-          enum: ['target', 'compound', 'activity'],
-        },
-        chembl_id: { type: 'string', description: 'ChEMBL target ID (e.g. "CHEMBL2093872"). Required when search_type=activity.' },
-        max_results: { type: 'number', description: 'Maximum results (default: 5, max: 10)' },
-      },
-      required: ['query'],
     },
   },
 ];
@@ -533,41 +463,6 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       return `## KEGG Pathways — "${query}"${orgNote} (${formatted.length} results)\n\n${formatted.join('\n\n')}`;
     }
 
-    // ── query_clinicaltrials ──────────────────────────────────────────
-    case 'query_clinicaltrials': {
-      const query = args.query as string;
-      const status = args.status as string | undefined;
-      const maxResults = (args.max_results as number) || 5;
-
-      const params = new URLSearchParams({
-        'query.term': query,
-        'pageSize': String(maxResults),
-        'format': 'json',
-        'fields': 'NCTId,BriefTitle,OverallStatus,Phase,Condition,StartDate,PrimaryCompletionDate',
-      });
-      if (status) params.set('filter.overallStatus', status);
-
-      const resp = await fetch(`https://clinicaltrials.gov/api/v2/studies?${params}`, { signal: AbortSignal.timeout(10000) });
-      if (!resp.ok) return `ClinicalTrials.gov search failed: HTTP ${resp.status}`;
-
-      const data = await resp.json() as { studies?: Array<{ protocolSection?: { identificationModule?: { nctId?: string; briefTitle?: string }; statusModule?: { overallStatus?: string; startDateStruct?: { date?: string } }; designModule?: { phases?: string[] }; conditionsModule?: { conditions?: string[] } } }> };
-      const studies = data.studies ?? [];
-      if (studies.length === 0) return `No clinical trials found for "${query}".`;
-
-      const lines = studies.map((s) => {
-        const id = s.protocolSection?.identificationModule;
-        const st = s.protocolSection?.statusModule;
-        const design = s.protocolSection?.designModule;
-        const cond = s.protocolSection?.conditionsModule;
-        const nctId = id?.nctId ?? '';
-        const phase = (design?.phases ?? []).join(', ') || 'N/A';
-        const conditions = (cond?.conditions ?? []).slice(0, 2).join(', ');
-        return `**${nctId}** — ${id?.briefTitle ?? '(no title)'}\n  Status: ${st?.overallStatus ?? 'N/A'} | Phase: ${phase} | Start: ${st?.startDateStruct?.date ?? ''}\n  Conditions: ${conditions}\n  🔗 https://clinicaltrials.gov/study/${nctId}`;
-      });
-
-      return `## ClinicalTrials.gov — "${query}" (${lines.length} results)\n\n${lines.join('\n\n')}`;
-    }
-
     // ── factorforge_verify_parameter ──────────────────────────────────
     case 'factorforge_verify_parameter': {
       const param = args.param as string;
@@ -770,174 +665,6 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       ].filter((l) => l !== null).join('\n').trim();
     }
 
-    // ── query_opentargets ─────────────────────────────────────────────
-    case 'query_opentargets': {
-      const query = args.query as string;
-      const entity = (args.entity as string) || 'target';
-      const maxResults = Math.min((args.max_results as number) || 5, 10);
-
-      const gqlQuery = {
-        query: `query Search($q: String!, $size: Int!, $entities: [String!]) {
-          search(queryString: $q, entityNames: $entities, page: {index: 0, size: $size}) {
-            hits { id entity name description }
-            total
-          }
-        }`,
-        variables: { q: query, size: maxResults, entities: [entity] },
-      };
-
-      const resp = await fetch('https://api.platform.opentargets.org/api/v4/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(gqlQuery),
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (!resp.ok) return `Open Targets API error: HTTP ${resp.status}`;
-
-      const data = await resp.json() as {
-        data?: { search?: { hits?: Array<{ id: string; name: string; description?: string }>; total?: number } }
-      };
-
-      const hits = data.data?.search?.hits ?? [];
-      if (hits.length === 0) return `No Open Targets results for "${query}" (entity: ${entity}).`;
-
-      const lines = hits.map((h) => {
-        const desc = h.description ? `\n  ${h.description.slice(0, 160)}${h.description.length > 160 ? '…' : ''}` : '';
-        const url = entity === 'disease'
-          ? `https://platform.opentargets.org/disease/${h.id}`
-          : `https://platform.opentargets.org/target/${h.id}`;
-        return `**${h.name}** \`${h.id}\`${desc}\n  🔗 ${url}`;
-      });
-
-      const label = entity === 'disease' ? 'Diseases' : 'Targets';
-      return `## Open Targets ${label} — "${query}" (${lines.length} results)\n\n${lines.join('\n\n')}`;
-    }
-
-    // ── query_fda ─────────────────────────────────────────────────────────
-    case 'query_fda': {
-      const drugName = args.drug_name as string;
-      const reportType = (args.report_type as string) || 'adverse_event';
-      const maxResults = Math.min((args.max_results as number) || 5, 10);
-
-      let url: string;
-      if (reportType === 'label') {
-        url = `https://api.fda.gov/drug/label.json?search=openfda.brand_name:"${encodeURIComponent(drugName)}"+openfda.generic_name:"${encodeURIComponent(drugName)}"&limit=${maxResults}`;
-      } else {
-        url = `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:"${encodeURIComponent(drugName)}"&limit=${maxResults}`;
-      }
-
-      const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (resp.status === 404) return `No FDA records found for "${drugName}".`;
-      if (!resp.ok) return `OpenFDA API error: HTTP ${resp.status}`;
-
-      const data = await resp.json() as {
-        results?: Array<Record<string, unknown>>;
-        meta?: { results?: { total?: number } };
-      };
-
-      const results = data.results ?? [];
-      if (results.length === 0) return `No FDA records found for "${drugName}".`;
-
-      const total = data.meta?.results?.total ?? results.length;
-
-      if (reportType === 'adverse_event') {
-        const lines = results.map((r, i) => {
-          const drugs = (r['patient'] as Record<string, unknown>)?.['drug'] as Array<Record<string, unknown>> | undefined;
-          const reactions = (r['patient'] as Record<string, unknown>)?.['reaction'] as Array<Record<string, unknown>> | undefined;
-          const drugNames = (drugs ?? []).slice(0, 3).map((d) => d['medicinalproduct'] as string).filter(Boolean).join(', ');
-          const reactionNames = (reactions ?? []).slice(0, 3).map((rx) => rx['reactionmeddrapt'] as string).filter(Boolean).join(', ');
-          return `**${i + 1}.** Drugs: ${drugNames || 'N/A'}\n  Reactions: ${reactionNames || 'N/A'}`;
-        });
-        return `## OpenFDA Adverse Events — "${drugName}" (${total.toLocaleString()} total)\n\n${lines.join('\n\n')}`;
-      } else {
-        const lines = results.map((r, i) => {
-          const openfda = r['openfda'] as Record<string, string[]> | undefined;
-          const brandName = (openfda?.['brand_name'] ?? [])[0] ?? 'N/A';
-          const genericName = (openfda?.['generic_name'] ?? [])[0] ?? 'N/A';
-          const indications = ((r['indications_and_usage'] as string) || '').slice(0, 200);
-          return `**${i + 1}.** ${brandName} (${genericName})\n  ${indications}...`;
-        });
-        return `## OpenFDA Drug Labels — "${drugName}"\n\n${lines.join('\n\n')}`;
-      }
-    }
-
-    // ── query_reactome ──────────────────────────────────────────────────────
-    case 'query_reactome': {
-      const query = args.query as string;
-      const species = (args.species as string) || 'Homo sapiens';
-      const maxResults = Math.min((args.max_results as number) || 5, 10);
-
-      const searchUrl = `https://reactome.org/ContentService/search/query?query=${encodeURIComponent(query)}&types=Pathway&species=${encodeURIComponent(species)}&cluster=true&Start=0&rows=${maxResults}`;
-      const resp = await fetch(searchUrl, {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(8000),
-      });
-
-      if (!resp.ok) return `Reactome API error: HTTP ${resp.status}`;
-
-      const data = await resp.json() as {
-        results?: Array<{
-          entries?: Array<{
-            stId?: string;
-            name?: string;
-            type?: string;
-            species?: string[];
-            exactType?: string;
-          }>;
-          typeName?: string;
-        }>;
-      };
-
-      const pathways: Array<{ stId: string; name: string }> = [];
-      for (const group of data.results ?? []) {
-        for (const entry of group.entries ?? []) {
-          if (entry.stId && entry.name) {
-            pathways.push({ stId: entry.stId, name: entry.name });
-          }
-        }
-        if (pathways.length >= maxResults) break;
-      }
-
-      if (pathways.length === 0) return `No Reactome pathways found for "${query}" in ${species}.`;
-
-      const lines = pathways.slice(0, maxResults).map((p, i) =>
-        `**${i + 1}.** ${p.name}\n  ID: ${p.stId} | 🔗 https://reactome.org/PathwayBrowser/#/${p.stId}`
-      );
-
-      return `## Reactome Pathways — "${query}" (${species})\n\n${lines.join('\n\n')}`;
-    }
-
-    // ── query_chembl ────────────────────────────────────────────────────────
-    case 'query_chembl': {
-      const q = String(args.query ?? '');
-      const searchType = String(args.search_type ?? 'target');
-      const chemblId = args.chembl_id ? String(args.chembl_id) : null;
-      const maxResults = Math.min(Number(args.max_results ?? 5), 10);
-
-      let url: string;
-      if (searchType === 'activity' && chemblId) {
-        url = `https://www.ebi.ac.uk/chembl/api/data/activity?target_chembl_id=${encodeURIComponent(chemblId)}&format=json&limit=${maxResults}`;
-      } else if (searchType === 'compound') {
-        url = `https://www.ebi.ac.uk/chembl/api/data/molecule/search?q=${encodeURIComponent(q)}&format=json&limit=${maxResults}`;
-      } else {
-        url = `https://www.ebi.ac.uk/chembl/api/data/target/search?q=${encodeURIComponent(q)}&format=json&limit=${maxResults}`;
-      }
-
-      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      if (!res.ok) throw new Error(`ChEMBL API error: ${res.status}`);
-      const data = await res.json() as Record<string, unknown>;
-
-      const items =
-        (data.targets as unknown[]) ??
-        (data.molecules as unknown[]) ??
-        (data.activities as unknown[]) ??
-        [];
-
-      if (items.length === 0) return `No ChEMBL results found for: ${q}`;
-      return JSON.stringify({ source: 'ChEMBL', search_type: searchType, query: q, results: items }, null, 2);
-    }
-
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -989,7 +716,7 @@ export async function POST(req: NextRequest) {
         return ok(id, {
           protocolVersion: '2024-11-05',
           capabilities: { tools: {} },
-          serverInfo: { name: 'eijex-mcp', version: '1.1.0' },
+          serverInfo: { name: 'eijex-mcp', version: '1.2.0' },
         });
 
       case 'notifications/initialized':
