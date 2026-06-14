@@ -743,15 +743,58 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
 
     case 'query_interpro': {
       const accession = (args.uniprot_accession as string).trim().toUpperCase();
-      const resp = await fetch(`https://www.ebi.ac.uk/interpro/api/protein/UniProt/${accession}/?extra_fields=hierarchy&format=json`, {
-        signal: AbortSignal.timeout(10000),
-      });
-      if (resp.status === 404) return `No InterPro data for "${accession}".`;
+      const resp = await fetch(
+        `https://www.ebi.ac.uk/interpro/api/entry/all/protein/UniProt/${accession}/?format=json`,
+        { signal: AbortSignal.timeout(10000) }
+      );
+      if (resp.status === 404) return `No InterPro entries for "${accession}".`;
       if (!resp.ok) return `InterPro API error: HTTP ${resp.status}`;
-      const data = await resp.json() as { entries?: Array<Record<string, unknown>> };
-      const entries = data.entries ?? [];
-      if (entries.length === 0) return `No InterPro domain entries found for "${accession}".`;
-      return `## InterPro — ${accession}\n\n${JSON.stringify(entries.slice(0, 10), null, 2)}`;
+
+      type InterProFragment = { start?: number; end?: number };
+      type InterProLocation = { fragments?: InterProFragment[] };
+      type InterProProtein = { entry_protein_locations?: InterProLocation[] };
+      type GoTerm = { id?: string; name?: string; category?: string };
+      type PathwayTerm = { id?: string; name?: string; source?: string };
+      type InterProMeta = {
+        accession?: string; name?: string; type?: string; short_name?: string;
+        source_database?: string; description?: string;
+        go_terms?: GoTerm[]; pathway_terms?: PathwayTerm[];
+        member_databases?: Record<string, unknown>;
+      };
+      const data = await resp.json() as {
+        count?: number;
+        results?: Array<{ metadata?: InterProMeta; proteins?: InterProProtein[] }>;
+      };
+
+      const results = data.results ?? [];
+      if (results.length === 0) return `No InterPro domain entries found for "${accession}".`;
+
+      const entries = results.slice(0, 10).map((r) => {
+        const m = r.metadata ?? {};
+        const locations = (r.proteins?.[0]?.entry_protein_locations ?? [])
+          .flatMap((loc) => loc.fragments ?? [])
+          .filter((f) => f.start != null && f.end != null)
+          .map((f) => ({ start: f.start as number, end: f.end as number }));
+        return {
+          accession: m.accession ?? '',
+          name: m.name ?? '',
+          type: m.type ?? '',
+          short_name: m.short_name ?? '',
+          source_database: m.source_database ?? '',
+          description: m.description ? m.description.slice(0, 300) : '',
+          locations,
+          member_databases: Object.keys(m.member_databases ?? {}),
+          go_terms: (m.go_terms ?? []).slice(0, 5).map((g) => ({ id: g.id ?? '', name: g.name ?? '', category: g.category ?? '' })),
+          pathway_terms: (m.pathway_terms ?? []).slice(0, 3).map((p) => ({ id: p.id ?? '', name: p.name ?? '', source: p.source ?? '' })),
+        };
+      });
+
+      return JSON.stringify({
+        query: accession,
+        result_count: data.count ?? results.length,
+        results: entries,
+        provenance: 'interpro_api_normalized_summary',
+      }, null, 2);
     }
 
     case 'prd_b_run_factorforge': {
