@@ -30,6 +30,28 @@ function checkRateLimit(ip: string): boolean {
 
 // ── Tool definitions ───────────────────────────────────────────────────
 
+const AGENTOPS_URL = process.env.EIJEX_AGENTOPS_URL ?? 'http://127.0.0.1:8787';
+const AGENTOPS_TOKEN = process.env.EIJEX_AGENTOPS_TOKEN ?? '';
+const PRD_B_FORBIDDEN_PARAMS = ['hub_root', 'raw_sequence', 'approval_status', 'local_path', 'sequence_material_ref'];
+
+function assertNoPrdBForbiddenParams(args: Record<string, unknown>): void {
+  for (const key of PRD_B_FORBIDDEN_PARAMS) {
+    if (key in args) throw new Error(`Forbidden parameter: ${key}`);
+  }
+}
+
+async function callAgentOps(method: 'GET' | 'POST', path: string, body?: unknown): Promise<unknown> {
+  if (!AGENTOPS_TOKEN) return 'PRD-B tools require EIJEX_AGENTOPS_TOKEN to be configured on the server.';
+  const resp = await fetch(`${AGENTOPS_URL}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${AGENTOPS_TOKEN}` },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(30000),
+  });
+  if (!resp.ok) return `agentOps error: HTTP ${resp.status}\n${await resp.text().catch(() => '')}`;
+  return resp.json();
+}
+
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
@@ -193,6 +215,60 @@ const TOOLS = [
       },
       required: ['uniprot_accession'],
     },
+  },
+  {
+    name: 'query_interpro',
+    description: 'Search InterPro for protein domain architecture by UniProt accession.',
+    inputSchema: {
+      type: 'object', additionalProperties: false,
+      properties: { uniprot_accession: { type: 'string', description: 'UniProt accession' } },
+      required: ['uniprot_accession'],
+    },
+  },
+  // PRD-B schemas deliberately exclude paths, raw sequences, and approval mutations.
+  {
+    name: 'prd_b_run_factorforge', description: 'Run FactorForge through the local agentOps boundary.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {
+      protein_sequence_hash: { type: 'string' },
+      sequence_ref_type: { type: 'string', enum: ['synthetic_fixture_id', 'server_local_fasta_id'] },
+      sequence_ref_id: { type: 'string' }, optimization_profile: { type: 'string' },
+      host: { type: 'string', enum: ['nbenthamiana', 'by2'] },
+    }, required: ['protein_sequence_hash', 'sequence_ref_type', 'sequence_ref_id'] },
+  },
+  {
+    name: 'prd_b_commit_private_record', description: 'Commit an approval_required private record.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {
+      protein_sequence_hash: { type: 'string' }, run_result: { type: 'object' }, intake_id: { type: 'string' },
+    }, required: ['protein_sequence_hash', 'run_result', 'intake_id'] },
+  },
+  {
+    name: 'prd_b_generate_approval_packet', description: 'Generate a local human-review packet.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: { protein_sequence_hash: { type: 'string' } }, required: ['protein_sequence_hash'] },
+  },
+  {
+    name: 'prd_b_list_index', description: 'List sanitized private-record index entries.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {
+      filter_status: { type: 'string', enum: ['approval_required', 'approved', 'rejected', 'changes_requested', 'all'] },
+      limit: { type: 'number' },
+    } },
+  },
+  {
+    name: 'prd_b_get_private_record', description: 'Read-only sanitized private-record view.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: {
+      protein_sequence_hash: { type: 'string' }, include_cli_metrics: { type: 'boolean' },
+    }, required: ['protein_sequence_hash'] },
+  },
+  {
+    name: 'prd_b_get_approval_status', description: 'Read approval status.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: { protein_sequence_hash: { type: 'string' } }, required: ['protein_sequence_hash'] },
+  },
+  {
+    name: 'prd_b_flush_public_projection', description: 'Flush a previously approved public projection.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: { protein_sequence_hash: { type: 'string' } }, required: ['protein_sequence_hash'] },
+  },
+  {
+    name: 'prd_b_get_public_projection', description: 'Read a sanitized public projection.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: { protein_sequence_hash: { type: 'string' } }, required: ['protein_sequence_hash'] },
   },
 ];
 
@@ -665,9 +741,71 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       ].filter((l) => l !== null).join('\n').trim();
     }
 
+    case 'query_interpro': {
+      const accession = (args.uniprot_accession as string).trim().toUpperCase();
+      const resp = await fetch(`https://www.ebi.ac.uk/interpro/api/protein/UniProt/${accession}/?extra_fields=hierarchy&format=json`, {
+        signal: AbortSignal.timeout(10000),
+      });
+      if (resp.status === 404) return `No InterPro data for "${accession}".`;
+      if (!resp.ok) return `InterPro API error: HTTP ${resp.status}`;
+      const data = await resp.json() as { entries?: Array<Record<string, unknown>> };
+      const entries = data.entries ?? [];
+      if (entries.length === 0) return `No InterPro domain entries found for "${accession}".`;
+      return `## InterPro — ${accession}\n\n${JSON.stringify(entries.slice(0, 10), null, 2)}`;
+    }
+
+    case 'prd_b_run_factorforge': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('POST', '/prd-b/run-factorforge', {
+        protein_sequence_hash: args.protein_sequence_hash,
+        sequence_ref: { type: args.sequence_ref_type, id: args.sequence_ref_id },
+        optimization_profile: args.optimization_profile ?? 'balanced',
+        host: args.host ?? 'nbenthamiana',
+        scoring_contract_version: 'v1.1',
+      }));
+    }
+    case 'prd_b_commit_private_record': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('POST', '/prd-b/commit-private-record', {
+        protein_sequence_hash: args.protein_sequence_hash, run_result: args.run_result, intake_id: args.intake_id,
+      }));
+    }
+    case 'prd_b_generate_approval_packet': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('POST', '/prd-b/generate-approval-packet', { protein_sequence_hash: args.protein_sequence_hash }));
+    }
+    case 'prd_b_list_index': {
+      assertNoPrdBForbiddenParams(args);
+      const qs = new URLSearchParams();
+      if (args.filter_status) qs.set('filter_status', String(args.filter_status));
+      if (args.limit) qs.set('limit', String(args.limit));
+      return formatAgentOps(await callAgentOps('GET', `/prd-b/list-index?${qs}`));
+    }
+    case 'prd_b_get_private_record': {
+      assertNoPrdBForbiddenParams(args);
+      const hash = encodeURIComponent(String(args.protein_sequence_hash));
+      return formatAgentOps(await callAgentOps('GET', `/prd-b/get-private-record/${hash}?include_cli_metrics=${args.include_cli_metrics ? 'true' : 'false'}`));
+    }
+    case 'prd_b_get_approval_status': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('GET', `/prd-b/get-approval-status/${encodeURIComponent(String(args.protein_sequence_hash))}`));
+    }
+    case 'prd_b_flush_public_projection': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('POST', '/prd-b/flush-public-projection', { protein_sequence_hash: args.protein_sequence_hash }));
+    }
+    case 'prd_b_get_public_projection': {
+      assertNoPrdBForbiddenParams(args);
+      return formatAgentOps(await callAgentOps('GET', `/prd-b/get-public-projection/${encodeURIComponent(String(args.protein_sequence_hash))}`));
+    }
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
+}
+
+function formatAgentOps(result: unknown): string {
+  return typeof result === 'string' ? result : JSON.stringify(result, null, 2);
 }
 
 // ── JSON-RPC helpers ───────────────────────────────────────────────────

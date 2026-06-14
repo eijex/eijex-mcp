@@ -1,11 +1,11 @@
 export interface McpParameter {
   name: string;
-  type: 'string' | 'number' | 'boolean';
+  type: 'string' | 'number' | 'boolean' | 'object';
   required: boolean;
   description: string;
 }
 
-export type McpToolGroup = 'agent' | 'skill' | 'workflow';
+export type McpToolGroup = 'agent' | 'skill' | 'workflow' | 'prd_b';
 
 export interface McpToolDefinition {
   name: string;
@@ -267,6 +267,19 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     ],
     relatedTools: ['query_uniprot', 'query_pdb'],
   },
+  {
+    name: 'query_interpro',
+    displayName: 'query_interpro',
+    icon: 'IP',
+    group: 'skill',
+    description: 'Search InterPro for protein domain architecture by UniProt accession.',
+    longDescription: 'Queries InterPro for domain entries, family classifications, and boundary coordinates.',
+    tags: ['Domain', 'Protein', 'Biotech'],
+    parameters: [{ name: 'uniprot_accession', type: 'string', required: true, description: 'UniProt accession' }],
+    keyFeatures: ['InterPro EBI REST API', 'Domain boundary coordinates'],
+    useCases: ['Understanding domain architecture before CDS design'],
+    relatedTools: ['query_uniprot', 'query_alphafold', 'query_pdb'],
+  },
   // ── Workflows ─────────────────────────────────────────────────────────
   {
     name: 'factorforge_verify_parameter',
@@ -297,6 +310,57 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Re-evaluate any FactorForge scoring constant with new evidence',
     ],
     relatedTools: ['factorforge_cds_optimize', 'query_pubmed', 'query_pdb'],
+  },
+  // PRD-B governance tools are local agentOps wrappers. Approval mutations are not exposed.
+  {
+    name: 'prd_b_run_factorforge', displayName: 'prd_b_run_factorforge', icon: 'B',
+    group: 'prd_b', description: 'Run FactorForge using an allowlisted local sequence reference.',
+    longDescription: 'Runs the local PRD-B adapter without accepting raw sequences or paths.', tags: ['PRD-B'],
+    parameters: [
+      { name: 'protein_sequence_hash', type: 'string', required: true, description: 'Sequence identity hash' },
+      { name: 'sequence_ref_type', type: 'string', required: true, description: 'synthetic_fixture_id or server_local_fasta_id' },
+      { name: 'sequence_ref_id', type: 'string', required: true, description: 'Allowlisted sequence reference ID' },
+      { name: 'optimization_profile', type: 'string', required: false, description: 'Optimization profile' },
+      { name: 'host', type: 'string', required: false, description: 'Host' },
+    ], keyFeatures: ['No raw sequence input'], useCases: ['Local governed FactorForge run'], relatedTools: ['prd_b_commit_private_record'],
+  },
+  {
+    name: 'prd_b_commit_private_record', displayName: 'prd_b_commit_private_record', icon: 'B',
+    group: 'prd_b', description: 'Commit a private record in approval_required state.',
+    longDescription: 'Always creates approval_required records.', tags: ['PRD-B'],
+    parameters: [
+      { name: 'protein_sequence_hash', type: 'string', required: true, description: 'Sequence identity hash' },
+      { name: 'run_result', type: 'object', required: true, description: 'Sanitized run result' },
+      { name: 'intake_id', type: 'string', required: true, description: 'Intake ID' },
+    ], keyFeatures: ['Approval required by construction'], useCases: ['Commit governed evidence'], relatedTools: ['prd_b_generate_approval_packet'],
+  },
+  ...[
+    ['prd_b_generate_approval_packet', 'Generate a local human-review packet.'],
+    ['prd_b_get_approval_status', 'Read approval status.'],
+    ['prd_b_flush_public_projection', 'Flush a previously approved public projection.'],
+    ['prd_b_get_public_projection', 'Read a sanitized public projection.'],
+  ].map(([name, description]) => ({
+    name, displayName: name, icon: 'B', group: 'prd_b' as McpToolGroup, description,
+    longDescription: description, tags: ['PRD-B'],
+    parameters: [{ name: 'protein_sequence_hash', type: 'string' as const, required: true, description: 'Sequence identity hash' }],
+    keyFeatures: ['Local governance boundary'], useCases: ['PRD-B governance'], relatedTools: [],
+  })),
+  {
+    name: 'prd_b_list_index', displayName: 'prd_b_list_index', icon: 'B', group: 'prd_b',
+    description: 'List sanitized private-record index entries.', longDescription: 'Lists sanitized index metadata only.', tags: ['PRD-B'],
+    parameters: [
+      { name: 'filter_status', type: 'string', required: false, description: 'Status filter' },
+      { name: 'limit', type: 'number', required: false, description: 'Maximum records' },
+    ], keyFeatures: ['Sanitized metadata'], useCases: ['Review queue'], relatedTools: ['prd_b_get_private_record'],
+  },
+  {
+    name: 'prd_b_get_private_record', displayName: 'prd_b_get_private_record', icon: 'B', group: 'prd_b',
+    description: 'Read-only sanitized view. Never returns raw_sequence or local paths.',
+    longDescription: 'Returns an allowlisted read-only view of a private record.', tags: ['PRD-B'],
+    parameters: [
+      { name: 'protein_sequence_hash', type: 'string', required: true, description: 'Sequence identity hash' },
+      { name: 'include_cli_metrics', type: 'boolean', required: false, description: 'Include separated CLI metrics' },
+    ], keyFeatures: ['No local paths'], useCases: ['Review private metadata'], relatedTools: ['prd_b_get_approval_status'],
   },
 ];
 
