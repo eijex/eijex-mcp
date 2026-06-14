@@ -834,6 +834,10 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       return formatAgentOps(await callAgentOps('GET', `/prd-b/get-approval-status/${encodeURIComponent(String(args.protein_sequence_hash))}`));
     }
     case 'prd_b_flush_public_projection': {
+      // PRD-B GOVERNANCE INVARIANT: no_public_projection_default = true
+      // Run and commit never create public projections. Projection requires
+      // explicit human approval outside MCP, audited packet/hash validation,
+      // and an explicit flush invocation. MCP approval tools remain absent.
       assertNoPrdBForbiddenParams(args);
       return formatAgentOps(await callAgentOps('POST', '/prd-b/flush-public-projection', { protein_sequence_hash: args.protein_sequence_hash }));
     }
