@@ -10,6 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { evaluateToolRisk } from '@/app/_lib/tool-risk-registry';
 
 // ── Rate limiting (in-memory, per serverless instance) ────────────────
 const RATE_LIMIT = 60;
@@ -915,6 +916,7 @@ export async function POST(req: NextRequest) {
           name: string;
           arguments?: Record<string, unknown>;
         };
+        evaluateToolRisk(name, args, ip);
         const text = await handleTool(name, args);
         return ok(id, { content: [{ type: 'text', text }] });
       }
@@ -926,6 +928,12 @@ export async function POST(req: NextRequest) {
         return err(id, -32601, `Method not found: ${method}`);
     }
   } catch (e) {
-    return err(id, -32603, String(e));
+    const status = typeof e === 'object' && e !== null && 'status' in e
+      ? Number((e as { status?: number }).status)
+      : 200;
+    const response = err(id, -32603, String(e));
+    return status === 403 || status === 404 || status === 429
+      ? NextResponse.json(await response.json(), { status })
+      : response;
   }
 }
