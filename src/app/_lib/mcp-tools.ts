@@ -31,7 +31,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
-      'Uses the FactorForge v3.2.0 stable design path: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
+      'Uses the FactorForge v3.2.1 stable design path: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
       'Returns CAI score, GC%, and the designed DNA sequence.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
@@ -39,7 +39,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
     ],
     keyFeatures: [
-      'Constraint-based DP feasibility design (v3.2.0)',
+      'Constraint-based DP feasibility design (v3.2.1)',
       'CAI and GC% metrics',
       'Golden Gate / MoClo-oriented Type IIS site review',
       'Multiple public design profiles (balanced, high_cai, gc_target, assembly_friendly)',

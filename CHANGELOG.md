@@ -7,13 +7,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [1.2.0] — 2026-06-17
 
 ### Fixed
 - **Profile enum** — `factorforge_cds_optimize` and batch route now expose only the 4 API-validated profiles (`balanced`, `high_cai`, `gc_target`, `assembly_friendly`); non-public experimental profiles removed from enum.
 
 ### Changed
-- `factorforge_cds_optimize` description updated to FactorForge v3.1.9.
+- `factorforge_cds_optimize` description updated to FactorForge v3.2.1.
 - ⚠ `gc_target` profile now targets ~60% GC by default (breaking change from v3.1.7); pass `target_gc=42.5` for old behavior.
 
 ---
