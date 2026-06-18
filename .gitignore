@@ -48,3 +48,6 @@ src/app/_lib/data/briefing-history.json
 src/app/_lib/data/model-guide.json
 src/app/_lib/data/operational-prompts.ts
 src/lib/project-metadata.ts
+
+# Local idea inbox (not for repo)
+_ideas/
