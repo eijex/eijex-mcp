@@ -50,3 +50,10 @@ FactorForge CDS generates in-silico CDS design candidates. It does not guarantee
 
 - [FactorForge CDS](https://factorforge.eijex.com) — Constraint-based CDS design engine for plant CDS design workflows
 - [mcp.eijex.com](https://mcp.eijex.com) — Web UI
+
+## Get in Touch
+
+- **GitHub Issues** — bugs, features: [github.com/eijex/eijex-mcp/issues](https://github.com/eijex/eijex-mcp/issues)
+- **Email** — eijex.lab@gmail.com
+- **FactorForge** — [factorforge.eijex.com](https://factorforge.eijex.com)
+- **Lab** — [www.eijex.com](https://www.eijex.com)
