@@ -1,6 +1,6 @@
 # Eijex MCP
 
-**Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics and CDS-design tools to MCP-compatible clients.
+**Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics, literature lookup, and FactorForge CDS design/review tools to MCP-compatible clients.
 
 ## Connect
 
@@ -19,7 +19,7 @@
 
 | Tool | Description |
 |------|-------------|
-| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate and sequence metrics |
+| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate with pre-synthesis sequence-review metrics |
 | `factorforge_cds_compare` | Compare multiple public CDS design profiles side-by-side (CAI, GC%, score) |
 | `factorforge_cds_batch` | Generate CDS candidates for up to 20 sequences in a single request |
 | `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |
@@ -44,11 +44,11 @@ Eijex MCP provides database lookup and in-silico workflow tools only. It does no
 
 **Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to the public MCP endpoint.** Use local FactorForge or a private MCP deployment for sensitive work.
 
-FactorForge CDS generates in-silico CDS design candidates. It does not guarantee expression, yield, solubility, or biological activity. Wet-lab validation is required.
+FactorForge CDS generates in-silico CDS design candidates and pre-synthesis review artifacts. It does not guarantee expression, yield, synthesis acceptance, folding, glycosylation, regulatory approval, or biological activity. Wet-lab validation is required.
 
 ## Related
 
-- [FactorForge CDS](https://factorforge.eijex.com) — Constraint-based CDS design engine for plant CDS design workflows
+- [FactorForge CDS](https://factorforge.eijex.com) — CDS design and pre-synthesis sequence review for plant workflows
 - [mcp.eijex.com](https://mcp.eijex.com) — Web UI
 
 ## Get in Touch
