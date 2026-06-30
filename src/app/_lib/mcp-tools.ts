@@ -32,7 +32,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
       'Uses the FactorForge v3.3.0 stable design path with the N. benthamiana NbeV1.1 high-confidence CDS-derived active default: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
-      'Returns CAI score, GC%, and the designed DNA sequence.',
+      'Returns CAI score, GC%, and a reviewable CDS candidate.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
@@ -85,7 +85,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate CDS candidates for up to 20 protein sequences in a single request.',
     longDescription:
       'Runs FactorForge CDS design on multiple protein sequences in one API call. ' +
-      'Returns CAI, GC%, and designed DNA for each sequence. ' +
+      'Returns CAI, GC%, and a reviewable CDS candidate for each sequence. ' +
       'All sequences use the same profile. Maximum 20 sequences per request.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
