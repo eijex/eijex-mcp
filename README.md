@@ -44,11 +44,11 @@ Eijex MCP provides database lookup and in-silico workflow tools only. It does no
 
 **Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to the public MCP endpoint.** Use local FactorForge or a private MCP deployment for sensitive work.
 
-FactorForge CDS generates in-silico CDS design candidates and pre-synthesis review artifacts. It does not guarantee expression, yield, synthesis acceptance, folding, glycosylation, regulatory approval, or biological activity. Wet-lab validation is required.
+FactorForge CDS generates in-silico CDS design candidates and pre-synthesis review artifacts. Outputs are design-review artifacts, not experimental validation, synthesis-acceptance decisions, regulatory advice, or comparative biological-performance evidence.
 
 ## Related
 
-- [FactorForge CDS](https://factorforge.eijex.com) — CDS design and pre-synthesis sequence review for plant workflows
+- [FactorForge CDS](https://factorforge.eijex.com) — CDS design and pre-synthesis sequence review with the v3.3.0 NbeV1.1 high-confidence CDS-derived active default
 - [mcp.eijex.com](https://mcp.eijex.com) — Web UI
 
 ## Get in Touch
