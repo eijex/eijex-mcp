@@ -56,7 +56,7 @@ async function callAgentOps(method: 'GET' | 'POST', path: string, body?: unknown
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.2.8. Supports N. benthamiana (default) and Tobacco BY-2 (--host by2). Returns pre-synthesis sequence-review metrics and rule-scan output; wet-lab validation is required and no expression, yield, synthesis-acceptance, folding, glycosylation, or regulatory outcome is guaranteed.',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.3.0. Supports the N. benthamiana NbeV1.1 high-confidence CDS-derived active default and Tobacco BY-2 (--host by2). Returns pre-synthesis sequence-review metrics and rule-scan output; outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
     inputSchema: {
       type: 'object',
       properties: {
