@@ -12,6 +12,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - Aligned FactorForge MCP/tool public copy with FactorForge CDS v3.3.0 and the N. benthamiana NbeV1.1 high-confidence CDS-derived active default.
 - Tightened public claim-boundary language so FactorForge outputs are framed as in-silico design-review artifacts, not experimental validation or comparative biological-performance evidence.
+- Removed unused build-time data generation from the production Vercel build command and corrected its repository-root resolution for manual/local use.
 
 ## [1.2.0] — 2026-06-17
 
