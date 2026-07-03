@@ -16,6 +16,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - **MCP `initialize`** — honor the client-requested `protocolVersion`: echo it back when the server supports it, otherwise return the latest supported revision, instead of always replying `2024-11-05`.
+- **Homepage disclaimer legibility** — raised the research-use/claim-boundary disclaimer's text color from `zinc-600` (~2.6:1 contrast, below WCAG AA) to `zinc-400` (~7.8:1) so it's actually readable.
 
 ## [1.2.0] — 2026-06-17
 

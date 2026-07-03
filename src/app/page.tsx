@@ -61,7 +61,7 @@ export default function Home() {
         <p className="text-zinc-400 text-base mb-8">
           Turns scientific context into reviewable CDS candidates, pre-synthesis checks, and lookup results
         </p>
-        <p className="text-xs text-zinc-600 mb-8">
+        <p className="text-xs text-zinc-400 mb-8">
           For research and in-silico use only. FactorForge tools support reviewability and reproducibility; outputs are design-review artifacts, not experimental validation, synthesis-acceptance decisions, regulatory advice, or comparative biological-performance evidence. Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to this public endpoint.
         </p>
 
