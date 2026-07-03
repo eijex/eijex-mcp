@@ -14,6 +14,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Tightened public claim-boundary language so FactorForge outputs are framed as in-silico design-review artifacts, not experimental validation or comparative biological-performance evidence.
 - Removed unused build-time data generation from the production Vercel build command and corrected its repository-root resolution for manual/local use.
 
+### Fixed
+- **MCP `initialize`** — honor the client-requested `protocolVersion`: echo it back when the server supports it, otherwise return the latest supported revision, instead of always replying `2024-11-05`.
+
 ## [1.2.0] — 2026-06-17
 
 ### Fixed
