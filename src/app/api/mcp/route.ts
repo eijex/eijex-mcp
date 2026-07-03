@@ -866,6 +866,14 @@ function err(id: unknown, code: number, message: string) {
   return NextResponse.json({ jsonrpc: '2.0', id, error: { code, message } });
 }
 
+// ── MCP protocol versions ──────────────────────────────────────────────
+// Revisions this server supports, oldest → newest. On `initialize` we echo the
+// client's requested version when it's supported, otherwise fall back to the
+// latest — per the MCP version-negotiation rules.
+// https://modelcontextprotocol.io/specification/versioning
+const SUPPORTED_PROTOCOL_VERSIONS = ['2024-11-05', '2025-03-26', '2025-06-18', '2025-11-25'];
+const LATEST_PROTOCOL_VERSION = SUPPORTED_PROTOCOL_VERSIONS[SUPPORTED_PROTOCOL_VERSIONS.length - 1];
+
 // ── Route handlers ─────────────────────────────────────────────────────
 
 export async function GET() {
@@ -898,12 +906,18 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (method) {
-      case 'initialize':
+      case 'initialize': {
+        const requested = (params as { protocolVersion?: unknown } | undefined)?.protocolVersion;
+        const protocolVersion =
+          typeof requested === 'string' && SUPPORTED_PROTOCOL_VERSIONS.includes(requested)
+            ? requested
+            : LATEST_PROTOCOL_VERSION;
         return ok(id, {
-          protocolVersion: '2024-11-05',
+          protocolVersion,
           capabilities: { tools: {} },
           serverInfo: { name: 'eijex-mcp', version: '1.2.0' },
         });
+      }
 
       case 'notifications/initialized':
         return new NextResponse(null, { status: 204 });
