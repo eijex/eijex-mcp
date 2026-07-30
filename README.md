@@ -19,7 +19,7 @@
 
 | Tool | Description |
 |------|-------------|
-| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate with pre-synthesis sequence-review metrics |
+| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate with structured JSON-RPC output, pre-synthesis sequence-review metrics, and advisory Pareto negotiation when public constraints conflict |
 | `factorforge_cds_compare` | Compare multiple public CDS design profiles side-by-side (CAI, GC%, score) |
 | `factorforge_cds_batch` | Generate CDS candidates for up to 20 sequences in a single request |
 | `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |
@@ -45,6 +45,17 @@ Eijex MCP provides database lookup and in-silico workflow tools only. It does no
 **Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to the public MCP endpoint.** Use local FactorForge or a private MCP deployment for sensitive work.
 
 FactorForge CDS generates in-silico CDS design candidates and pre-synthesis review artifacts. Outputs are design-review artifacts, not experimental validation, synthesis-acceptance decisions, regulatory advice, or comparative biological-performance evidence.
+
+### FactorForge AgentOps JSON-RPC contract
+
+`factorforge_cds_optimize` returns a structured JSON document inside the MCP text content. The contract includes:
+
+- `status`: `success`, `upstream_error`, or `constraint_conflict`
+- `metrics`: public-safe CAI/GC/length summary fields returned by FactorForge
+- `conflict`: machine-readable failed constraint axes when a 0% pass-rate/all-constraint conflict is reported
+- `negotiation`: advisory-only Pareto frontier candidates; the MCP server never silently relaxes constraints or reruns optimization
+- `validationhub_handoff`: documented Registry v0 handoff points for artifact hashes/metadata only; this does not change the Registry v0 schema
+- `claim_boundary`: in-silico design-review scope statement
 
 ## Related
 

@@ -10,6 +10,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  buildFactorForgeOptimizeOutputSchema,
+  buildFactorForgeUpstreamError,
+  isPublicFactorForgeProfile,
+  normalizeFactorForgeOptimizeResponse,
+} from '@/app/_lib/factorforge-agentops-contract';
 import { evaluateToolRisk } from '@/app/_lib/tool-risk-registry';
 
 // ── Rate limiting (in-memory, per serverless instance) ────────────────
@@ -72,6 +78,7 @@ const TOOLS = [
       },
       required: ['sequence'],
     },
+    outputSchema: buildFactorForgeOptimizeOutputSchema(),
   },
   {
     name: 'factorforge_cds_compare',
@@ -283,11 +290,15 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       const sequence = args.sequence as string;
       const profile = (args.profile as string) || 'balanced';
 
+      if (!isPublicFactorForgeProfile(profile)) {
+        throw new JsonRpcError(-32602, `Invalid factorforge_cds_optimize profile: ${profile}. Supported profiles: balanced, high_cai, gc_target, assembly_friendly.`);
+      }
+
       if (!sequence || sequence.trim().length === 0) {
-        return 'Error: sequence is required.';
+        throw new JsonRpcError(-32602, 'Invalid factorforge_cds_optimize arguments: sequence is required.');
       }
       if (sequence.trim().length > 2000) {
-        return 'Error: sequence exceeds maximum length of 2000 amino acids.';
+        throw new JsonRpcError(-32602, 'Invalid factorforge_cds_optimize arguments: sequence exceeds maximum length of 2000 amino acids.');
       }
 
       const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
@@ -299,37 +310,13 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
 
       if (!resp.ok) {
         const errText = await resp.text().catch(() => '');
-        return `FactorForge API error: HTTP ${resp.status}\n${errText}`;
+        const structured = buildFactorForgeUpstreamError(resp.status, errText, { profile, host: 'nbenthamiana' });
+        return JSON.stringify(structured, null, 2);
       }
 
-      const data = await resp.json() as {
-        dna?: string;
-        metrics?: { cai?: number; gc_percent?: number; length?: number };
-        warnings?: string[];
-        profile?: string;
-      };
-
-      const dna = data.dna ?? '';
-      const m = data.metrics ?? {};
-      const warnings = (data.warnings ?? []).map((w) => `⚠️ ${w}`).join('\n');
-
-      return [
-        `## FactorForge CDS Optimization Result`,
-        `Profile: ${data.profile ?? profile} | Host: Nicotiana benthamiana`,
-        '',
-        `**Metrics**`,
-        `- CAI: ${m.cai?.toFixed(4) ?? 'N/A'} (target ≥ 0.80)`,
-        `- GC%: ${m.gc_percent?.toFixed(1) ?? 'N/A'}% (target 55–65%)`,
-        `- Length: ${m.length ?? dna.length} nt`,
-        '',
-        `**Designed DNA (5'→3')**`,
-        '```',
-        dna || '(no sequence returned)',
-        '```',
-        warnings ? `\n${warnings}` : '',
-        '',
-        `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`,
-      ].filter((l) => l !== undefined).join('\n').trim();
+      const data = await resp.json();
+      const structured = normalizeFactorForgeOptimizeResponse(data, { profile, host: 'nbenthamiana' });
+      return JSON.stringify(structured, null, 2);
     }
 
     // ── factorforge_cds_compare ───────────────────────────────────────
@@ -856,6 +843,21 @@ function formatAgentOps(result: unknown): string {
   return typeof result === 'string' ? result : JSON.stringify(result, null, 2);
 }
 
+class JsonRpcError extends Error {
+  constructor(public code: number, message: string, public httpStatus = 200) {
+    super(message);
+  }
+}
+
+function parseStructuredToolContent(name: string, text: string): unknown | undefined {
+  if (name !== 'factorforge_cds_optimize') return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
 // ── JSON-RPC helpers ───────────────────────────────────────────────────
 
 function ok(id: unknown, result: unknown) {
@@ -932,7 +934,10 @@ export async function POST(req: NextRequest) {
         };
         evaluateToolRisk(name, args, ip);
         const text = await handleTool(name, args);
-        return ok(id, { content: [{ type: 'text', text }] });
+        const structuredContent = parseStructuredToolContent(name, text);
+        return ok(id, structuredContent === undefined
+          ? { content: [{ type: 'text', text }] }
+          : { content: [{ type: 'text', text }], structuredContent });
       }
 
       case 'ping':
@@ -942,10 +947,14 @@ export async function POST(req: NextRequest) {
         return err(id, -32601, `Method not found: ${method}`);
     }
   } catch (e) {
-    const status = typeof e === 'object' && e !== null && 'status' in e
-      ? Number((e as { status?: number }).status)
-      : 200;
-    const response = err(id, -32603, String(e));
+    const status = e instanceof JsonRpcError
+      ? e.httpStatus
+      : typeof e === 'object' && e !== null && 'status' in e
+        ? Number((e as { status?: number }).status)
+        : 200;
+    const code = e instanceof JsonRpcError ? e.code : -32603;
+    const message = e instanceof Error ? e.message : String(e);
+    const response = err(id, code, message);
     return status === 403 || status === 404 || status === 429
       ? NextResponse.json(await response.json(), { status })
       : response;

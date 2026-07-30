@@ -9,6 +9,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **FactorForge AgentOps JSON-RPC contract** — `factorforge_cds_optimize` now advertises a structured `outputSchema` and returns normalized JSON with `success`, `upstream_error`, or `constraint_conflict` status, public-safe metrics, advisory-only Pareto negotiation candidates, claim-boundary wording, and documented ValidationHub Registry v0 handoff fields.
+- **Synthetic contract tests** — added `npm test` coverage for the FactorForge MCP schema and constraint-conflict negotiation using fixed synthetic fixtures instead of live production calls.
+
 ### Changed
 - Aligned FactorForge MCP/tool public copy with FactorForge CDS v3.3.0 and the N. benthamiana NbeV1.1 high-confidence CDS-derived active default.
 - Tightened public claim-boundary language so FactorForge outputs are framed as in-silico design-review artifacts, not experimental validation or comparative biological-performance evidence.

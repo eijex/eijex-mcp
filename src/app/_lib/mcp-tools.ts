@@ -32,7 +32,8 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
       'Uses the FactorForge v3.4.0 stable design path with the N. benthamiana NbeV1.1 high-confidence CDS-derived active default: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
-      'Returns CAI score, GC%, and a reviewable CDS candidate.',
+      'Returns CAI score, GC%, a reviewable CDS candidate, and structured AgentOps metadata. ' +
+      'When public constraints conflict with a 0% pass-rate outcome, the tool returns an advisory-only Pareto negotiation object rather than silently relaxing constraints or rerunning optimization.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
@@ -43,6 +44,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'CAI and GC% metrics',
       'Golden Gate / MoClo-oriented Type IIS site review',
       'Multiple public design profiles (balanced, high_cai, gc_target, assembly_friendly)',
+      'Structured JSON-RPC result contract with advisory Pareto negotiation on constraint conflicts',
     ],
     useCases: [
       'Plant CDS design review',
