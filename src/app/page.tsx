@@ -43,7 +43,7 @@ export default function Home() {
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-12">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">BioDesign Execution Layer</span>
+          <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-md">Plant Bio-Design Execution Layer</span>
         </div>
         <div className="flex items-center gap-4 mb-2">
           <Image
@@ -59,7 +59,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="text-zinc-400 text-base mb-8">
-          Turns scientific context into reviewable CDS candidates, pre-synthesis checks, and lookup results
+          Turns scientific context into reviewable plant CDS candidates, pre-synthesis checks, and lookup results
         </p>
         <p className="text-xs text-zinc-400 mb-8">
           For research and in-silico use only. FactorForge tools support reviewability and reproducibility; outputs are design-review artifacts, not experimental validation, synthesis-acceptance decisions, regulatory advice, or comparative biological-performance evidence. Do not submit patient data, confidential partner data, proprietary sequences, or unpublished constructs to this public endpoint.
