@@ -2,6 +2,9 @@
 
 **Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics, literature lookup, and FactorForge CDS design/review tools to MCP-compatible clients.
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-EA4AAA?style=flat&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/eijex)
+
+
 ## Connect
 
 ```json
@@ -53,7 +56,9 @@ FactorForge CDS generates in-silico CDS design candidates and pre-synthesis revi
 
 ## Get in Touch
 
+- **Sponsor** — Support our research via [GitHub Sponsors](https://github.com/sponsors/eijex) or [PayPal](https://paypal.me/munkyukim)
 - **GitHub Issues** — bugs, features: [github.com/eijex/eijex-mcp/issues](https://github.com/eijex/eijex-mcp/issues)
 - **Email** — eijex.lab@gmail.com
 - **FactorForge** — [factorforge.eijex.com](https://factorforge.eijex.com)
 - **Lab** — [www.eijex.com](https://www.eijex.com)
+

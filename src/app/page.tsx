@@ -104,7 +104,7 @@ export default function Home() {
       {/* Footer */}
       <div className="max-w-4xl mx-auto mt-12 pt-6 border-t border-zinc-900 flex flex-col items-center gap-1.5">
         <p className="text-xs text-zinc-600 font-mono">{MCP_URL}</p>
-        <div className="flex items-center gap-3 text-xs text-zinc-700">
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-zinc-700">
           <span>© 2026 Eijex</span>
           <span>·</span>
           <a
@@ -123,6 +123,24 @@ export default function Home() {
             className="hover:text-zinc-500 transition-colors"
           >
             GitHub
+          </a>
+          <span>·</span>
+          <a
+            href="https://github.com/sponsors/eijex"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-500 transition-colors"
+          >
+            Sponsor
+          </a>
+          <span>·</span>
+          <a
+            href="https://paypal.me/munkyukim"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-zinc-500 transition-colors"
+          >
+            PayPal
           </a>
         </div>
       </div>
