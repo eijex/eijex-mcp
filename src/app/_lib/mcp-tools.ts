@@ -22,6 +22,38 @@ export interface McpToolDefinition {
 }
 
 export const ALL_TOOLS: McpToolDefinition[] = [
+  {
+    name: 'evaluate_sequence',
+    displayName: 'evaluate_sequence',
+    icon: '🛡️',
+    group: 'agent',
+    description: '[Production] Evaluate DNA against AgentOS Hard Gate.',
+    longDescription: 'Simulates the CanonicalSharedEvaluator and AgentOS Hard Gate for MCP Clients. Checks physical constraints (e.g. BsaI Type IIS, Stop Codons) and calculates Fuzzy Metrics (CAI, GC).',
+    tags: ['AgentOS', 'Production', 'Evaluator'],
+    parameters: [
+      { name: 'dna_sequence', type: 'string', required: true, description: 'DNA sequence to evaluate' },
+      { name: 'assembly_method', type: 'string', required: false, description: 'Default: golden_gate' },
+    ],
+    keyFeatures: ['Deterministic physical constraints', 'Golden Gate BsaI checks', 'CAI & GC% Calculation'],
+    useCases: ['Validate ML-generated DNA before synthesis', 'Enforce absolute biological rules'],
+    relatedTools: ['optimize_protein_slm'],
+  },
+  {
+    name: 'optimize_protein_slm',
+    displayName: 'optimize_protein_slm',
+    icon: '🧪',
+    group: 'agent',
+    description: '[Research Preview] FactorForge 4.0 SLLM Generator.',
+    longDescription: 'Optimize an Amino Acid sequence to a Synthesizable DNA Sequence using the FactorForge 4.0 SLLM (Research Preview). Outputs must be routed through evaluate_sequence.',
+    tags: ['FactorForge', 'SLM', 'Experimental'],
+    parameters: [
+      { name: 'amino_acid_sequence', type: 'string', required: true, description: 'Amino acid sequence' },
+    ],
+    keyFeatures: ['Generative LLM Optimization', 'Research Preview Mode'],
+    useCases: ['AI-driven sequence design', 'Exploring non-deterministic optimization'],
+    relatedTools: ['evaluate_sequence'],
+  },
+
   // ── Agents ────────────────────────────────────────────────────────────
   {
     name: 'factorforge_cds_optimize',
