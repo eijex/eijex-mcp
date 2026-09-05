@@ -1,3 +1,7 @@
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+const exec = promisify(execFile);
+import path from 'path';
 /**
  * Eijex MCP Server
  * Protocol: JSON-RPC 2.0 over HTTP (Streamable HTTP transport)
@@ -292,8 +296,10 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
     case 'factorforge_cds_optimize': {
       const sequence = args.sequence as string;
       const profile = (args.profile as string) || 'balanced';
-      const engine = (args.engine as string) || 'dual_compare';
+      const mode = (args.mode as string) || 'single';
+      const methods = (args.methods as string[]) || (mode === 'compare' ? ['profile', 'dp', 'lm'] : ['profile']);
       const host = (args.host as string) || 'nbenthamiana';
+      const save_db = args.save_db === true;
 
       if (!sequence || sequence.trim().length === 0) {
         return 'Error: sequence is required.';
@@ -302,80 +308,80 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         return 'Error: sequence exceeds maximum length of 2000 amino acids.';
       }
 
-      const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sequence: sequence.trim().toUpperCase(),
-          profile,
-          engine,
-          host,
-        }),
-        signal: AbortSignal.timeout(30000),
-      });
+      const fs = await import('fs/promises');
+      const os = await import('os');
+      const scriptPath = path.resolve(process.cwd(), 'scripts', 'local_agent.py');
+      const payload = JSON.stringify({ sequence: sequence.trim().toUpperCase(), profile, mode, methods, host, save_db });
+      
+      const tmpFile = path.join(os.tmpdir(), `ff_payload_${Date.now()}.json`);
+      await fs.writeFile(tmpFile, payload, 'utf-8');
 
-      if (!resp.ok) {
-        const errText = await resp.text().catch(() => '');
-        return `FactorForge API error: HTTP ${resp.status}\n${errText}`;
+      let outStr = '';
+      try {
+        const { stdout } = await exec(`python "${scriptPath}" < "${tmpFile}"`, {
+          shell: true,
+          env: { ...process.env, FACTORFORGE_ONNX_MODEL_PATH: 'C:\\Work\\eijex\\factorforge\\models\\factorforge_v3_5_0_mbart.onnx' },
+          timeout: 60000
+        } as any);
+        outStr = stdout;
+      } catch (err: any) {
+         return `FactorForge Local Agent Error:\n${err.message || err}\nSTDOUT: ${err.stdout}\nSTDERR: ${err.stderr}`;
+      } finally {
+        await fs.unlink(tmpFile).catch(()=>{});
       }
 
-      const data = await resp.json() as {
-        dna?: string;
-        metrics?: { cai?: number; gc_percent?: number; length?: number; type_iis_clean?: boolean };
-        warnings?: string[];
-        profile?: string;
-        engine?: string;
-        comparison?: {
-          rule_cai?: number;
-          rule_gc?: number;
-          slm_cai?: number;
-          slm_gc?: number;
-          codon_match_rate?: number;
-        };
-      };
+      let data: any;
+      try { data = JSON.parse(outStr); } catch (e) { return `Error parsing python bridge output:\n${outStr}`; }
+      if (data.error) return `Optimization failed:\n${data.error}`;
 
-      const dna = data.dna ?? '';
-      const m = data.metrics ?? {};
-      const warnings = (data.warnings ?? []).map((w) => `⚠️ ${w}`).join('\n');
-      const comp = data.comparison;
-
-      const lines = [
-        `## FactorForge CDS Optimization Result`,
-        `Engine: ${data.engine ?? engine} | Profile: ${data.profile ?? profile} | Host: ${host}`,
+      const resLines = [
+        `## FactorForge CDS Optimization (Local MCP)`,
+        `Mode: ${mode} | Profile: ${profile} | Host: ${host}`,
         '',
-        `**Metrics & Compliance**`,
-        `- AA Translation Identity: 100.0% (Verified)`,
-        `- CAI: ${m.cai?.toFixed(4) ?? 'N/A'} (Target ≥ 0.80)`,
-        `- GC%: ${m.gc_percent?.toFixed(1) ?? 'N/A'}% (Host Target ~40%)`,
-        `- TypeIIS Restriction Sites: ${m.type_iis_clean ? '0 Sites (100% Clean)' : 'Warning: check sites'}`,
-        `- CDS Length: ${m.length ?? dna.length} nt`,
       ];
 
-      if (comp) {
-        lines.push(
+      if (mode === 'single') {
+        const primaryMethod = methods[0] || 'profile';
+        const res = data.results[primaryMethod];
+        if (save_db) {
+            resLines.push(`- DB Provenance: ${res?.db_run_id ? (res.db_run_id.startsWith('db_error') ? '❌ Failed (' + res.db_run_id + ')' : '✅ Saved (' + res.db_run_id + ')') : 'N/A'}`);
+            resLines.push('');
+        }
+        if (res?.error) return `Error in ${primaryMethod}: ${res.error}`;
+        if (!res) return `No result returned for ${primaryMethod}`;
+        resLines.push(
+          `**Method: ${primaryMethod.toUpperCase()}**`,
+          `- CAI: ${res.metrics?.cai?.toFixed(4) ?? 'N/A'}`,
+          `- GC%: ${res.metrics?.gc_percent?.toFixed(1) ?? 'N/A'}%`,
           '',
-          `**Dual-Engine Comparison Summary**`,
-          `- Rule-Based: CAI ${comp.rule_cai?.toFixed(4) ?? 'N/A'} | GC ${comp.rule_gc?.toFixed(1) ?? 'N/A'}%`,
-          `- FactorForge-SLM: CAI ${comp.slm_cai?.toFixed(4) ?? 'N/A'} | GC ${comp.slm_gc?.toFixed(1) ?? 'N/A'}%`,
-          `- Synonymous Codon Concordance: ${comp.codon_match_rate?.toFixed(1) ?? 'N/A'}% match`
+          `**Sequence (FASTA)**`,
+          '```fasta',
+          `>factorforge-${profile}-${primaryMethod}`,
+          res.sequence,
+          '```'
         );
+      } else {
+        resLines.push(`**Method Comparison Summary**`);
+        for (const m of methods) {
+            const cai = data.comparison[`${m}_cai`];
+            const gc = data.comparison[`${m}_gc`];
+            resLines.push(`- ${m.toUpperCase()}: CAI ${cai ? cai.toFixed(4) : 'N/A'} | GC ${gc ? gc.toFixed(1) : 'N/A'}%`);
+        }
+        resLines.push('');
+        resLines.push(`**Detailed Results**`);
+        for (const m of methods) {
+            const res = data.results[m];
+            resLines.push(`### ${m.toUpperCase()}`);
+            if (res?.error) {
+                resLines.push(`Error: ${res.error}`);
+            } else if (res) {
+                resLines.push('```fasta', `>factorforge-${profile}-${m}`, res.sequence, '```');
+            }
+        }
       }
 
-      lines.push(
-        '',
-        `**Designed DNA (5'→3')**`,
-        '```',
-        dna || '(no sequence returned)',
-        '```',
-        warnings ? `\n${warnings}` : '',
-        '',
-        `Powered by [FactorForge CDS](https://factorforge.eijex.com) (AGPL-3.0)`
-      );
-
-      return lines.filter((l) => l !== undefined).join('\n').trim();
+      return resLines.join('\n').trim();
     }
-
-    // ── factorforge_cds_compare ───────────────────────────────────────
     case 'factorforge_cds_compare': {
       const sequence = args.sequence as string;
       const profiles = ((args.profiles as string) || 'balanced,high_cai,gc_target').split(',').map((p) => p.trim());
