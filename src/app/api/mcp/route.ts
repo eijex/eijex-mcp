@@ -60,7 +60,7 @@ async function callAgentOps(method: 'GET' | 'POST', path: string, body?: unknown
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate from a protein sequence using FactorForge CDS v3.4.4. Supports the N. benthamiana NbeV1.1 high-confidence CDS-derived active default and Tobacco BY-2 (--host by2). Returns pre-synthesis sequence-review metrics and rule-scan output; outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate using the FactorForge v3.5.0 release-candidate line. Rule Gen 1 and DP v2 Gen 2 are deterministic public paths; sLLM Gen 3 is an explicitly feature-gated research preview. Outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -75,8 +75,8 @@ const TOOLS = [
         },
         engine: {
           type: 'string',
-          description: 'Optimization engine: profile (rule-based), slm (FactorForge-SLM model), or dual_compare (side-by-side comparison). Default: dual_compare',
-          enum: ['profile', 'slm', 'dual_compare'],
+          description: 'Optimization engine: profile (Rule 1.0.0), dp (DP v2 2.0.1 stable), dp_v2_1 (2.1.0-dev explicit development candidate), slm (Gen 3 research preview), or dual_compare. Default: profile',
+          enum: ['profile', 'dp', 'dp_v2_1', 'slm', 'dual_compare'],
         },
         host: {
           type: 'string',
@@ -296,8 +296,11 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
     case 'factorforge_cds_optimize': {
       const sequence = args.sequence as string;
       const profile = (args.profile as string) || 'balanced';
-      const mode = (args.mode as string) || 'single';
-      const methods = (args.methods as string[]) || (mode === 'compare' ? ['profile', 'dp', 'lm'] : ['profile']);
+      const requestedEngine = (args.engine as string) || 'profile';
+      const mode = requestedEngine === 'dual_compare' ? 'compare' : 'single';
+      const methods = requestedEngine === 'dual_compare'
+        ? ['profile', 'dp', 'lm']
+        : [requestedEngine === 'slm' ? 'lm' : requestedEngine];
       const host = (args.host as string) || 'nbenthamiana';
       const save_db = args.save_db === true;
 
@@ -306,6 +309,45 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       }
       if (sequence.trim().length > 2000) {
         return 'Error: sequence exceeds maximum length of 2000 amino acids.';
+      }
+
+      if (requestedEngine === 'dp_v2_1') {
+        if (save_db) return 'Error: save_db is not available for the public DP v2.1 API path.';
+        const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sequence: sequence.trim().toUpperCase(),
+            profile,
+            objective: 'dp_v2_1',
+            host,
+            return_candidates: true,
+          }),
+          signal: AbortSignal.timeout(60000),
+        });
+        const result = await resp.json() as {
+          error?: string;
+          optimized_sequence?: string;
+          metrics?: { cai?: number; gc_percent?: number };
+          provenance?: { engine_version?: string; engine_status?: string };
+        };
+        if (!resp.ok || result.error) {
+          return `FactorForge DP v2.1 API error: ${result.error || `HTTP ${resp.status}`}`;
+        }
+        if (!result.optimized_sequence) return 'FactorForge DP v2.1 API returned no sequence.';
+        return [
+          '## FactorForge CDS Optimization',
+          `Engine: DP v2.1 ${result.provenance?.engine_version || '2.1.0-dev'} | Status: ${result.provenance?.engine_status || 'development_rc'} | Host: ${host}`,
+          '- Evidence boundary: in-silico development candidate; RNA folding is not computed during generation.',
+          `- CAI: ${result.metrics?.cai?.toFixed(4) ?? 'N/A'}`,
+          `- GC%: ${result.metrics?.gc_percent?.toFixed(1) ?? 'N/A'}%`,
+          '',
+          '**Sequence (FASTA)**',
+          '```fasta',
+          `>factorforge-${profile}-dp_v2_1`,
+          result.optimized_sequence,
+          '```',
+        ].join('\n');
       }
 
       const fs = await import('fs/promises');
@@ -322,16 +364,26 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
           shell: true,
           env: { ...process.env, FACTORFORGE_ONNX_MODEL_PATH: 'C:\\Work\\eijex\\factorforge\\models\\factorforge_v3_5_0_mbart.onnx' },
           timeout: 60000
-        } as any);
+        });
         outStr = stdout;
-      } catch (err: any) {
-         return `FactorForge Local Agent Error:\n${err.message || err}\nSTDOUT: ${err.stdout}\nSTDERR: ${err.stderr}`;
+      } catch (err: unknown) {
+         const execError = err as { message?: string; stdout?: string; stderr?: string };
+         return `FactorForge Local Agent Error:\n${execError.message || String(err)}\nSTDOUT: ${execError.stdout || ''}\nSTDERR: ${execError.stderr || ''}`;
       } finally {
         await fs.unlink(tmpFile).catch(()=>{});
       }
 
-      let data: any;
-      try { data = JSON.parse(outStr); } catch (e) { return `Error parsing python bridge output:\n${outStr}`; }
+      let data: {
+        error?: string;
+        results: Record<string, {
+          error?: string;
+          sequence?: string;
+          metrics?: { cai?: number; gc_percent?: number };
+          db_run_id?: string;
+        }>;
+        comparison?: Record<string, number | null>;
+      };
+      try { data = JSON.parse(outStr); } catch { return `Error parsing python bridge output:\n${outStr}`; }
       if (data.error) return `Optimization failed:\n${data.error}`;
 
       const resLines = [
@@ -349,6 +401,8 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         }
         if (res?.error) return `Error in ${primaryMethod}: ${res.error}`;
         if (!res) return `No result returned for ${primaryMethod}`;
+        if (!res.sequence) return `No sequence returned for ${primaryMethod}`;
+        const resultSequence = res.sequence;
         resLines.push(
           `**Method: ${primaryMethod.toUpperCase()}**`,
           `- CAI: ${res.metrics?.cai?.toFixed(4) ?? 'N/A'}`,
@@ -357,14 +411,14 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
           `**Sequence (FASTA)**`,
           '```fasta',
           `>factorforge-${profile}-${primaryMethod}`,
-          res.sequence,
+          resultSequence,
           '```'
         );
       } else {
         resLines.push(`**Method Comparison Summary**`);
         for (const m of methods) {
-            const cai = data.comparison[`${m}_cai`];
-            const gc = data.comparison[`${m}_gc`];
+            const cai = data.comparison?.[`${m}_cai`];
+            const gc = data.comparison?.[`${m}_gc`];
             resLines.push(`- ${m.toUpperCase()}: CAI ${cai ? cai.toFixed(4) : 'N/A'} | GC ${gc ? gc.toFixed(1) : 'N/A'}%`);
         }
         resLines.push('');
@@ -375,7 +429,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
             if (res?.error) {
                 resLines.push(`Error: ${res.error}`);
             } else if (res) {
-                resLines.push('```fasta', `>factorforge-${profile}-${m}`, res.sequence, '```');
+                resLines.push('```fasta', `>factorforge-${profile}-${m}`, res.sequence || '', '```');
             }
         }
       }

@@ -43,8 +43,8 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'optimize_protein_slm',
     icon: '🧪',
     group: 'agent',
-    description: '[Research Preview] FactorForge 4.0 SLLM Generator.',
-    longDescription: 'Optimize an Amino Acid sequence to a Synthesizable DNA Sequence using the FactorForge 4.0 SLLM (Research Preview). Outputs must be routed through evaluate_sequence.',
+    description: '[Research Preview] FactorForge v3.5 sLLM Hybrid (Gen 3).',
+    longDescription: 'Generate an in-silico CDS candidate with the feature-gated sLLM Hybrid 0.1 preview. No trained production-model or biological-performance claim is made; outputs must be routed through evaluate_sequence.',
     tags: ['FactorForge', 'SLM', 'Experimental'],
     parameters: [
       { name: 'amino_acid_sequence', type: 'string', required: true, description: 'Amino acid sequence' },
@@ -63,15 +63,17 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
-      'Uses the FactorForge v3.4.4 stable design path with the N. benthamiana NbeV1.1 high-confidence CDS-derived active default: DP feasibility design, profile-based rule scanning, Type IIS site review, and output. ' +
+      'Uses the FactorForge v3.5.0 release-candidate line with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1 2.1.0-dev is an explicit development candidate; sLLM Gen 3 remains a feature-gated research preview. ' +
       'Returns CAI score, GC%, and a reviewable CDS candidate.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
       { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
+      { name: 'engine', type: 'string', required: false, description: 'profile | dp | dp_v2_1 | slm | dual_compare' },
     ],
     keyFeatures: [
-      'Constraint-based DP feasibility design (v3.4.4)',
+      'Automaton-constrained DP v2 feasibility design (engine 2.0.1)',
+      'Explicit DP v2.1 three-axis development candidate (engine 2.1.0-dev)',
       'CAI and GC% metrics',
       'Golden Gate / MoClo-oriented Type IIS site review',
       'Multiple public design profiles (balanced, high_cai, gc_target, assembly_friendly)',

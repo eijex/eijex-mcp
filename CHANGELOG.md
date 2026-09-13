@@ -10,6 +10,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- Added explicit `engine=dp_v2_1` routing for the FactorForge 2.1.0-dev
+  development candidate. Stable DP v2 2.0.1 remains a separate selectable path;
+  no biological-performance claim is made.
 - Aligned FactorForge MCP/tool public copy with FactorForge CDS v3.3.0 and the N. benthamiana NbeV1.1 high-confidence CDS-derived active default.
 - Tightened public claim-boundary language so FactorForge outputs are framed as in-silico design-review artifacts, not experimental validation or comparative biological-performance evidence.
 - Removed unused build-time data generation from the production Vercel build command and corrected its repository-root resolution for manual/local use.

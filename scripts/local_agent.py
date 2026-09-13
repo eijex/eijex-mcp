@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from typing import Dict, Any
+from types import SimpleNamespace
 
 # Disable noisy logging
 logging.getLogger().setLevel(logging.CRITICAL)
@@ -13,6 +14,8 @@ sys.path.insert(0, r"C:\Work\eijex\factorforge\src")
 try:
     from factorforge.engines.profile.optimizer import RuleBasedOptimizer
     from factorforge.engines.dp_adapter import DPEngineAdapter
+    from factorforge.engines.dp_v2_1 import DPV21Optimizer
+    from factorforge.analysis.metrics import load_codon_usage_table
     from factorforge.engines.lm.inference import LMEngineAdapter, ONNXBeamSearchEngine
     from factorforge.evaluation.evaluator import SharedEvaluator
     from factorforge.db.connector import FactorForgeDBConnector
@@ -40,6 +43,21 @@ def run_optimization(payload: dict) -> dict:
                 engine = RuleBasedOptimizer()
             elif method == "dp":
                 engine = DPEngineAdapter()
+            elif method == "dp_v2_1":
+                if host != "nbenthamiana":
+                    raise ValueError("DP v2.1 currently supports host=nbenthamiana only")
+                table = load_codon_usage_table()
+                result = DPV21Optimizer().optimize(sequence, table.codon_weights)
+                res = SimpleNamespace(
+                    sequence=result["sequence"],
+                    metrics={"cai": result["cai"], "gc_percent": result["gc_percent"]},
+                    metadata={
+                        "engine_id": "dp_v2_1",
+                        "engine_version": result["engine_version"],
+                        "engine_status": "development_rc",
+                        "claim_boundary": "in_silico_design_candidate",
+                    },
+                )
             elif method == "lm":
                 # Check if ONNX model path is provided via env var for Milestone 5
                 onnx_path = os.environ.get("FACTORFORGE_ONNX_MODEL_PATH")
@@ -47,7 +65,8 @@ def run_optimization(payload: dict) -> dict:
             else:
                 continue
 
-            res = engine.optimize(sequence, profile=profile, host=host)
+            if method != "dp_v2_1":
+                res = engine.optimize(sequence, profile=profile, host=host)
             
             cai = res.metrics.get("cai", 0.0)
             gc = res.metrics.get("gc_percent", 0.0)
