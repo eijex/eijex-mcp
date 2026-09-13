@@ -15,6 +15,9 @@ import path from 'path';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { evaluateToolRisk } from '@/app/_lib/tool-risk-registry';
+import packageJson from '../../../../package.json';
+
+const MCP_SERVER_VERSION = packageJson.version;
 
 // ── Rate limiting (in-memory, per serverless instance) ────────────────
 const RATE_LIMIT = 60;
@@ -982,7 +985,7 @@ const LATEST_PROTOCOL_VERSION = SUPPORTED_PROTOCOL_VERSIONS[SUPPORTED_PROTOCOL_V
 export async function GET() {
   return NextResponse.json({
     name: 'eijex-mcp',
-    version: '1.2.0',
+    version: MCP_SERVER_VERSION,
     description: 'Eijex MCP Server — CDS design, bioinformatics lookup, and structured workflow tools',
     transport: 'streamable-http',
     endpoint: '/api/mcp',
@@ -1018,7 +1021,7 @@ export async function POST(req: NextRequest) {
         return ok(id, {
           protocolVersion,
           capabilities: { tools: {} },
-          serverInfo: { name: 'eijex-mcp', version: '1.2.0' },
+          serverInfo: { name: 'eijex-mcp', version: MCP_SERVER_VERSION },
         });
       }
 
