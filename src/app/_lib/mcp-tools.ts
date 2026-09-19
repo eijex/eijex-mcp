@@ -43,8 +43,8 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'optimize_protein_slm',
     icon: '🧪',
     group: 'agent',
-    description: '[Research Preview] FactorForge v3.5 sLLM Hybrid (Gen 3).',
-    longDescription: 'Generate an in-silico CDS candidate with the feature-gated sLLM Hybrid 0.1 preview. No trained production-model or biological-performance claim is made; outputs must be routed through evaluate_sequence.',
+    description: '[Research Preview] FactorForge v3.6 sLLM Hybrid (Gen 3).',
+    longDescription: 'Generate an in-silico CDS candidate with feature-gated sLLM Hybrid 0.2 and versioned partial-DP rescue. No biological-performance claim is made; outputs must be routed through deterministic validation.',
     tags: ['FactorForge', 'SLM', 'Experimental'],
     parameters: [
       { name: 'amino_acid_sequence', type: 'string', required: true, description: 'Amino acid sequence' },
@@ -63,17 +63,17 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
-      'Uses the FactorForge v3.5.0 release-candidate line with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1 2.1.0-dev is an explicit development candidate; sLLM Gen 3 remains a feature-gated research preview. ' +
+      'Uses FactorForge v3.6.0 with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1.1 2.1.1 is an explicit local-guard path; sLLM 0.2.0-preview.1 remains feature-gated. ' +
       'Returns CAI score, GC%, and a reviewable CDS candidate.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence (single-letter code)' },
       { name: 'profile', type: 'string', required: false, description: 'balanced | high_cai | gc_target | assembly_friendly' },
-      { name: 'engine', type: 'string', required: false, description: 'profile | dp | dp_v2_1 | slm | dual_compare' },
+      { name: 'engine', type: 'string', required: false, description: 'profile | dp | dp_v2_1_1 | dp_v2_1 | slm | dual_compare' },
     ],
     keyFeatures: [
       'Automaton-constrained DP v2 feasibility design (engine 2.0.1)',
-      'Explicit DP v2.1 three-axis development candidate (engine 2.1.0-dev)',
+      'Explicit DP v2.1.1 local-guard path (engine 2.1.1)',
       'CAI and GC% metrics',
       'Golden Gate / MoClo-oriented Type IIS site review',
       'Multiple public design profiles (balanced, high_cai, gc_target, assembly_friendly)',
@@ -84,6 +84,24 @@ export const ALL_TOOLS: McpToolDefinition[] = [
       'Synonymous CDS candidate generation',
     ],
     relatedTools: ['factorforge_cds_compare', 'query_pubmed', 'query_pdb'],
+  },
+  {
+    name: 'factorforge_cds_slate',
+    displayName: 'factorforge_cds_slate',
+    icon: '🧭',
+    group: 'agent',
+    description: 'Generate a bounded Top-K computational discovery slate.',
+    longDescription: 'Uses FactorForge v3.6.0 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
+    tags: ['FactorForge', 'Discovery', 'Research Preview'],
+    parameters: [
+      { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence' },
+      { name: 'target_name', type: 'string', required: false, description: 'Target label' },
+      { name: 'host', type: 'string', required: false, description: 'nbenthamiana | by2' },
+      { name: 'top_k', type: 'number', required: false, description: '1–10; default 3' },
+    ],
+    keyFeatures: ['Top-K versioned hypotheses', 'Shared hard-constraint filtering', 'Explicit generator and rescue lineage'],
+    useCases: ['Prospective experiment-panel design', 'Computational ablation and diversity review'],
+    relatedTools: ['factorforge_cds_optimize', 'factorforge_cds_compare'],
   },
   {
     name: 'factorforge_cds_compare',

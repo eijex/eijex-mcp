@@ -2,10 +2,10 @@
 
 **Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics, literature lookup, and FactorForge CDS design/review tools to MCP-compatible clients.
 
-The v1.3.0 contract identifies FactorForge v3.5.0 as a release candidate and
+The v1.4.0 contract identifies FactorForge v3.6.0 as the integrated product release and
 keeps product and engine versions separate: Rule 1.0.0, stable/default DP v2
-2.0.1, explicit DP v2.1 2.1.0-dev development candidate, and the feature-gated
-sLLM Hybrid 0.1.0-preview.1.
+2.0.1, explicit DP v2.1.1 2.1.1 local-guard path, feature-gated sLLM Hybrid
+0.2.0-preview.1, and adaptive partial-DP rescue 1.0.0.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-yellow?style=flat&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/eijex)
 
@@ -27,7 +27,8 @@ sLLM Hybrid 0.1.0-preview.1.
 
 | Tool | Description |
 |------|-------------|
-| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate with Rule, DP v2, or explicit DP v2.1 engine selection and pre-synthesis review metrics |
+| `factorforge_cds_optimize` | Generate an in-silico synonymous CDS candidate with Rule, DP v2, or explicit DP v2.1.1 local-guard engine selection and pre-synthesis review metrics |
+| `factorforge_cds_slate` | Generate a research-only Top-K candidate slate with explicit generator and evidence boundaries |
 | `factorforge_cds_compare` | Compare multiple public CDS design profiles side-by-side (CAI, GC%, score) |
 | `factorforge_cds_batch` | Generate CDS candidates for up to 20 sequences in a single request |
 | `factorforge_verify_parameter` | Research workflow to verify or update a FactorForge design constant |

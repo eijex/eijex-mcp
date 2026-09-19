@@ -9,6 +9,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-09-19
+
+- Synchronized public descriptions with FactorForge 3.6.0, DP v2.1.1 2.1.1,
+  sLLM 0.2.0-preview.1, and adaptive partial-DP rescue 1.0.0.
+- Added `factorforge_cds_slate` for bounded Top-K computational research slates.
+
+- Added explicit `engine=dp_v2_1_1` proxy routing for FactorForge `2.1.1`,
+  including 45-nt initiation-GC, homopolymer, and guard-status summaries. The
+  prior `dp_v2_1` route remains available for comparison compatibility.
+
 ### Changed
 - Added explicit `engine=dp_v2_1` routing for the FactorForge 2.1.0-dev
   development candidate. Stable DP v2 2.0.1 remains a separate selectable path;

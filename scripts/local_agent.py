@@ -15,6 +15,7 @@ try:
     from factorforge.engines.profile.optimizer import RuleBasedOptimizer
     from factorforge.engines.dp_adapter import DPEngineAdapter
     from factorforge.engines.dp_v2_1 import DPV21Optimizer
+    from factorforge.engines.dp_v2_1_1 import DPV211Optimizer
     from factorforge.analysis.metrics import load_codon_usage_table
     from factorforge.engines.lm.inference import LMEngineAdapter, ONNXBeamSearchEngine
     from factorforge.evaluation.evaluator import SharedEvaluator
@@ -43,16 +44,22 @@ def run_optimization(payload: dict) -> dict:
                 engine = RuleBasedOptimizer()
             elif method == "dp":
                 engine = DPEngineAdapter()
-            elif method == "dp_v2_1":
+            elif method in {"dp_v2_1", "dp_v2_1_1"}:
                 if host != "nbenthamiana":
-                    raise ValueError("DP v2.1 currently supports host=nbenthamiana only")
+                    raise ValueError(f"{method} currently supports host=nbenthamiana only")
                 table = load_codon_usage_table()
-                result = DPV21Optimizer().optimize(sequence, table.codon_weights)
+                optimizer = DPV211Optimizer() if method == "dp_v2_1_1" else DPV21Optimizer()
+                result = optimizer.optimize(sequence, table.codon_weights)
                 res = SimpleNamespace(
                     sequence=result["sequence"],
-                    metrics={"cai": result["cai"], "gc_percent": result["gc_percent"]},
+                    metrics={
+                        "cai": result["cai"],
+                        "gc_percent": result["gc_percent"],
+                        "gc_5p_45nt_percent": result.get("gc_5p_45nt_percent"),
+                        "max_homopolymer_run": result.get("max_homopolymer_run"),
+                    },
                     metadata={
-                        "engine_id": "dp_v2_1",
+                        "engine_id": method,
                         "engine_version": result["engine_version"],
                         "engine_status": "development_rc",
                         "claim_boundary": "in_silico_design_candidate",
@@ -65,7 +72,7 @@ def run_optimization(payload: dict) -> dict:
             else:
                 continue
 
-            if method != "dp_v2_1":
+            if method not in {"dp_v2_1", "dp_v2_1_1"}:
                 res = engine.optimize(sequence, profile=profile, host=host)
             
             cai = res.metrics.get("cai", 0.0)

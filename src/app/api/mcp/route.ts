@@ -63,7 +63,7 @@ async function callAgentOps(method: 'GET' | 'POST', path: string, body?: unknown
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate using the FactorForge v3.5.0 release-candidate line. Rule Gen 1 and DP v2 Gen 2 are deterministic public paths; sLLM Gen 3 is an explicitly feature-gated research preview. Outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate using FactorForge v3.6.0. Rule Gen 1 and DP v2 Gen 2 are deterministic public paths; sLLM Gen 3 is an explicitly feature-gated research preview. Outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -78,14 +78,28 @@ const TOOLS = [
         },
         engine: {
           type: 'string',
-          description: 'Optimization engine: profile (Rule 1.0.0), dp (DP v2 2.0.1 stable), dp_v2_1 (2.1.0-dev explicit development candidate), slm (Gen 3 research preview), or dual_compare. Default: profile',
-          enum: ['profile', 'dp', 'dp_v2_1', 'slm', 'dual_compare'],
+          description: 'Optimization engine: profile (Rule 1.0.0), dp (DP v2 2.0.1 stable), dp_v2_1_1 (2.1.1 local-guard path), dp_v2_1 (comparison compatibility), slm (Gen 3 research preview), or dual_compare. Default: profile',
+          enum: ['profile', 'dp', 'dp_v2_1_1', 'dp_v2_1', 'slm', 'dual_compare'],
         },
         host: {
           type: 'string',
           description: 'Expression host: nbenthamiana | by2 (default: nbenthamiana)',
           enum: ['nbenthamiana', 'by2'],
         },
+      },
+      required: ['sequence'],
+    },
+  },
+  {
+    name: 'factorforge_cds_slate',
+    description: 'Generate a research-only Top-K FactorForge v3.6.0 candidate slate. Emitted candidates pass shared computational hard checks; results do not establish biological performance.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        sequence: { type: 'string', description: 'Amino acid sequence (single-letter code)' },
+        target_name: { type: 'string', description: 'Optional target label' },
+        host: { type: 'string', enum: ['nbenthamiana', 'by2'], description: 'Expression host' },
+        top_k: { type: 'number', description: 'Candidate count from 1 to 10 (default: 3)' },
       },
       required: ['sequence'],
     },
@@ -295,6 +309,32 @@ const TOOLS = [
 async function handleTool(name: string, args: Record<string, unknown>): Promise<string> {
   switch (name) {
 
+    case 'factorforge_cds_slate': {
+      const sequence = String(args.sequence || '').trim().toUpperCase();
+      const topK = Number(args.top_k || 3);
+      const host = String(args.host || 'nbenthamiana');
+      if (!sequence) return 'Error: sequence is required.';
+      if (sequence.length > 2000) return 'Error: sequence exceeds maximum length of 2000 amino acids.';
+      if (!Number.isInteger(topK) || topK < 1 || topK > 10) return 'Error: top_k must be an integer from 1 to 10.';
+      const resp = await fetch('https://factorforge.eijex.com/api/slate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sequence, target_name: args.target_name || 'Target-Protein', host, top_k: topK }),
+        signal: AbortSignal.timeout(60000),
+      });
+      const result = await resp.json() as { error?: string; data?: unknown };
+      if (!resp.ok || result.error) return `FactorForge slate API error: ${result.error || `HTTP ${resp.status}`}`;
+      return [
+        '## FactorForge Discovery Slate',
+        `FactorForge: 3.6.0 | Host: ${host} | Requested Top-K: ${topK}`,
+        '- Evidence boundary: computational research slate; no expression, yield, synthesis, or wet-lab claim.',
+        '',
+        '```json',
+        JSON.stringify(result.data, null, 2),
+        '```',
+      ].join('\n');
+    }
+
     // ── factorforge_cds_optimize ──────────────────────────────────────
     case 'factorforge_cds_optimize': {
       const sequence = args.sequence as string;
@@ -314,15 +354,17 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         return 'Error: sequence exceeds maximum length of 2000 amino acids.';
       }
 
-      if (requestedEngine === 'dp_v2_1') {
-        if (save_db) return 'Error: save_db is not available for the public DP v2.1 API path.';
+      if (requestedEngine === 'dp_v2_1' || requestedEngine === 'dp_v2_1_1') {
+        const isLocalGuard = requestedEngine === 'dp_v2_1_1';
+        const engineLabel = isLocalGuard ? 'DP v2.1.1' : 'DP v2.1';
+        if (save_db) return `Error: save_db is not available for the public ${engineLabel} API path.`;
         const resp = await fetch('https://factorforge.eijex.com/api/optimize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sequence: sequence.trim().toUpperCase(),
             profile,
-            objective: 'dp_v2_1',
+            objective: requestedEngine,
             host,
             return_candidates: true,
           }),
@@ -331,23 +373,29 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
         const result = await resp.json() as {
           error?: string;
           optimized_sequence?: string;
-          metrics?: { cai?: number; gc_percent?: number };
+          metrics?: { cai?: number; gc_percent?: number; gc_5p_45nt_percent?: number; max_homopolymer_run?: number; initiation_gc_status?: string };
           provenance?: { engine_version?: string; engine_status?: string };
         };
         if (!resp.ok || result.error) {
-          return `FactorForge DP v2.1 API error: ${result.error || `HTTP ${resp.status}`}`;
+          return `FactorForge ${engineLabel} API error: ${result.error || `HTTP ${resp.status}`}`;
         }
-        if (!result.optimized_sequence) return 'FactorForge DP v2.1 API returned no sequence.';
+        if (!result.optimized_sequence) return `FactorForge ${engineLabel} API returned no sequence.`;
         return [
           '## FactorForge CDS Optimization',
-          `Engine: DP v2.1 ${result.provenance?.engine_version || '2.1.0-dev'} | Status: ${result.provenance?.engine_status || 'development_rc'} | Host: ${host}`,
-          '- Evidence boundary: in-silico development candidate; RNA folding is not computed during generation.',
+          `Engine: ${engineLabel} ${result.provenance?.engine_version || (isLocalGuard ? '2.1.1' : '2.1.0-dev')} | Status: ${result.provenance?.engine_status || 'research_candidate'} | Host: ${host}`,
+          '- Evidence boundary: in-silico development candidate; RNA folding, when available, is evaluated separately from generation.',
           `- CAI: ${result.metrics?.cai?.toFixed(4) ?? 'N/A'}`,
           `- GC%: ${result.metrics?.gc_percent?.toFixed(1) ?? 'N/A'}%`,
+          ...(isLocalGuard ? [
+            `- 5′ 45-nt GC: ${result.metrics?.gc_5p_45nt_percent?.toFixed(1) ?? 'N/A'}%`,
+            `- Maximum homopolymer: ${result.metrics?.max_homopolymer_run ?? 'N/A'} nt`,
+            `- Initiation GC guard: ${result.metrics?.initiation_gc_status ?? 'N/A'}`,
+            '- Validation status: Target-mAb-A calibration complete; 36-protein holdout pending.',
+          ] : []),
           '',
           '**Sequence (FASTA)**',
           '```fasta',
-          `>factorforge-${profile}-dp_v2_1`,
+          `>factorforge-${profile}-${requestedEngine}`,
           result.optimized_sequence,
           '```',
         ].join('\n');
