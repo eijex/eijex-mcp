@@ -43,7 +43,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     displayName: 'optimize_protein_slm',
     icon: '🧪',
     group: 'agent',
-    description: '[Research Preview] FactorForge v3.6 sLLM Hybrid (Gen 3).',
+    description: '[Research Preview] FactorForge v3.5 sLLM Hybrid (Gen 3).',
     longDescription: 'Generate an in-silico CDS candidate with feature-gated sLLM Hybrid 0.2 and versioned partial-DP rescue. No biological-performance claim is made; outputs must be routed through deterministic validation.',
     tags: ['FactorForge', 'SLM', 'Experimental'],
     parameters: [
@@ -63,7 +63,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
-      'Uses FactorForge v3.6.0 with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1.1 2.1.1 is an explicit local-guard path; sLLM 0.2.0-preview.1 remains feature-gated. ' +
+      'Uses FactorForge v3.5.0 with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1.1 2.1.1 is an explicit local-guard path; sLLM 0.2.0-preview.1 remains feature-gated. ' +
       'Returns CAI score, GC%, and a reviewable CDS candidate.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
@@ -91,7 +91,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     icon: '🧭',
     group: 'agent',
     description: 'Generate a bounded Top-K computational discovery slate.',
-    longDescription: 'Uses FactorForge v3.6.0 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
+    longDescription: 'Uses FactorForge v3.5.0 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
     tags: ['FactorForge', 'Discovery', 'Research Preview'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence' },

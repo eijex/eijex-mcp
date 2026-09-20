@@ -63,7 +63,7 @@ async function callAgentOps(method: 'GET' | 'POST', path: string, body?: unknown
 const TOOLS = [
   {
     name: 'factorforge_cds_optimize',
-    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate using FactorForge v3.6.0. Rule Gen 1 and DP v2 Gen 2 are deterministic public paths; sLLM Gen 3 is an explicitly feature-gated research preview. Outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
+    description: 'Generate an in-silico synonymous DNA coding sequence (CDS) candidate using FactorForge v3.5.0. Rule Gen 1 and DP v2 Gen 2 are deterministic public paths; sLLM Gen 3 is an explicitly feature-gated research preview. Outputs are design-review artifacts, not experimental validation or comparative biological-performance evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -92,7 +92,7 @@ const TOOLS = [
   },
   {
     name: 'factorforge_cds_slate',
-    description: 'Generate a research-only Top-K FactorForge v3.6.0 candidate slate. Emitted candidates pass shared computational hard checks; results do not establish biological performance.',
+    description: 'Generate a research-only Top-K FactorForge v3.5.0 candidate slate. Emitted candidates pass shared computational hard checks; results do not establish biological performance.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -326,7 +326,7 @@ async function handleTool(name: string, args: Record<string, unknown>): Promise<
       if (!resp.ok || result.error) return `FactorForge slate API error: ${result.error || `HTTP ${resp.status}`}`;
       return [
         '## FactorForge Discovery Slate',
-        `FactorForge: 3.6.0 | Host: ${host} | Requested Top-K: ${topK}`,
+        `FactorForge: 3.5.0 | Host: ${host} | Requested Top-K: ${topK}`,
         '- Evidence boundary: computational research slate; no expression, yield, synthesis, or wet-lab claim.',
         '',
         '```json',
