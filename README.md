@@ -2,7 +2,7 @@
 
 **Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics, literature lookup, and FactorForge CDS design/review tools to MCP-compatible clients.
 
-The v1.4.0 contract identifies FactorForge v3.6.0 as the integrated product release and
+The v1.4.0 gateway contract now identifies FactorForge v3.5.4 as the product release and
 keeps product and engine versions separate: Rule 1.0.0, stable/default DP v2
 2.0.1, explicit DP v2.1.1 2.1.1 local-guard path, feature-gated sLLM Hybrid
 0.2.0-preview.1, and adaptive partial-DP rescue 1.0.0.

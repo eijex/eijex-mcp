@@ -9,6 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- Corrected the current FactorForge product reference to 3.5.4; engine versions,
+  gateway protocol behavior, and research-preview boundaries are unchanged.
+- Updated Next.js within the supported 16.x line and refreshed dependency locks;
+  the audited dependency tree has no reported vulnerabilities.
+
 ## [1.4.0] — 2026-09-19
 
 - Synchronized public descriptions with FactorForge 3.6.0, DP v2.1.1 2.1.1,

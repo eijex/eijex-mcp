@@ -91,7 +91,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     icon: '🧭',
     group: 'agent',
     description: 'Generate a bounded Top-K computational discovery slate.',
-    longDescription: 'Uses FactorForge v3.5.0 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
+    longDescription: 'Uses FactorForge v3.5.4 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
     tags: ['FactorForge', 'Discovery', 'Research Preview'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence' },
