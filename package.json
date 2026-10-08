@@ -1,6 +1,6 @@
 {
   "name": "eijex-mcp",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "description": "Eijex MCP server for FactorForge CDS and bio-AI workflow tools",
   "license": "MIT",

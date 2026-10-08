@@ -7,6 +7,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.4.2] — 2026-10-08
+
+- Refresh the runtime source-map dependency after production verification. Runtime dependency audit is clean; development-tool advisories remain tracked separately.
+
 ## [1.4.1] — 2026-10-08
 
 - Replace the deployment-dependent Python optimization bridge with the public HTTP API; preserve engine selection, report upstream provenance and signal tool failures with isError.
@@ -15,7 +19,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Removed stale FactorForge product labels; successful tool responses report upstream provenance; engine versions,
   gateway protocol behavior, and research-preview boundaries are unchanged.
 - Updated Next.js within the supported 16.x line and refreshed dependency locks;
-  the audited dependency tree has no reported vulnerabilities.
+  runtime dependencies were audited; development tooling requires separate review.
 
 ## [1.4.0] — 2026-09-19
 
