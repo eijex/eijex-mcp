@@ -83,11 +83,10 @@ npm run lint
 npm run build
 ```
 
-**No automated test suite exists yet** — there is no `tests/` directory and no `test`
-script in `package.json`. Until one is added, manually verify any route-handler change
-against `https://mcp.eijex.com/api/health` and the affected tool endpoint before
-merging. Do not claim "tests passing" in a completion report unless a test command was
-actually run.
+Run `npm test` for the HTTP proxy routing and MCP error contract (Node.js 24).
+Also run lint/build and smoke-test deployed tools before calling a release verified.
+The test suite uses synthetic input and mocked upstream responses; health alone
+is insufficient.
 
 ## 8. Security
 

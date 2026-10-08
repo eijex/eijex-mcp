@@ -7,9 +7,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [1.4.1] — 2026-10-08
 
-- Corrected the current FactorForge product reference to 3.5.4; engine versions,
+- Replace the deployment-dependent Python optimization bridge with the public HTTP API; preserve engine selection, report upstream provenance and signal tool failures with isError.
+- Add synthetic routing/error regression tests. Public optimization rejects save_db; private persistence remains a separate permissioned adapter.
+
+- Removed stale FactorForge product labels; successful tool responses report upstream provenance; engine versions,
   gateway protocol behavior, and research-preview boundaries are unchanged.
 - Updated Next.js within the supported 16.x line and refreshed dependency locks;
   the audited dependency tree has no reported vulnerabilities.

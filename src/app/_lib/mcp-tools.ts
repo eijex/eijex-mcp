@@ -63,7 +63,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     description: 'Generate an in-silico synonymous CDS candidate for N. benthamiana.',
     longDescription:
       'Converts an amino acid sequence into a synonymous coding DNA sequence (CDS) candidate for Nicotiana benthamiana-oriented design review. ' +
-      'Uses FactorForge v3.5.0 with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1.1 2.1.1 is an explicit local-guard path; sLLM 0.2.0-preview.1 remains feature-gated. ' +
+      'Uses the FactorForge public API with Rule 1.0.0 and DP v2 2.0.1 deterministic paths. DP v2.1.1 2.1.1 is an explicit local-guard path; sLLM 0.2.0-preview.1 remains feature-gated. ' +
       'Returns CAI score, GC%, and a reviewable CDS candidate.',
     tags: ['FactorForge', 'Biotech', 'DNA'],
     parameters: [
@@ -91,7 +91,7 @@ export const ALL_TOOLS: McpToolDefinition[] = [
     icon: '🧭',
     group: 'agent',
     description: 'Generate a bounded Top-K computational discovery slate.',
-    longDescription: 'Uses FactorForge v3.5.4 to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
+    longDescription: 'Uses the FactorForge public API to generate several versioned CDS hypotheses, apply shared hard checks, and return explicit generator lineage. It is a research comparison surface, not biological validation.',
     tags: ['FactorForge', 'Discovery', 'Research Preview'],
     parameters: [
       { name: 'sequence', type: 'string', required: true, description: 'Amino acid sequence' },

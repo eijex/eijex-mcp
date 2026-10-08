@@ -2,10 +2,15 @@
 
 **Eijex MCP** is a public Model Context Protocol server that exposes Eijex bioinformatics, literature lookup, and FactorForge CDS design/review tools to MCP-compatible clients.
 
-The v1.4.0 gateway contract now identifies FactorForge v3.5.4 as the product release and
-keeps product and engine versions separate: Rule 1.0.0, stable/default DP v2
-2.0.1, explicit DP v2.1.1 2.1.1 local-guard path, feature-gated sLLM Hybrid
-0.2.0-preview.1, and adaptive partial-DP rescue 1.0.0.
+The gateway keeps product and engine versions separate. FactorForge optimization
+uses its public HTTP API; product/engine provenance comes from the response.
+No Python executable, local model path or shared database is required on Vercel.
+Research modes remain subject to the upstream feature gate and return MCP tool
+errors when unavailable. Public MCP requests do not persist designs.
+
+Development checks: `npm test`, `npm run lint`, `npm run build` (Node.js 24).
+Test success is separate from live deployment. The 2026-10-08 repair is a local
+candidate until deployed and tested through the public MCP endpoint.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-yellow?style=flat&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/eijex)
 
