@@ -9,8 +9,9 @@ Research modes remain subject to the upstream feature gate and return MCP tool
 errors when unavailable. Public MCP requests do not persist designs.
 
 Development checks: `npm test`, `npm run lint`, `npm run build` (Node.js 24).
-Test success is separate from live deployment. The 2026-10-08 repair is a local
-candidate until deployed and tested through the public MCP endpoint.
+MCP 1.4.2 was deployed on 2026-10-08. Public endpoint checks confirmed profile
+and explicit DP v2.1.1 optimization, upstream provenance and save_db rejection.
+These synthetic engineering checks do not establish experimental performance.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-yellow?style=flat&logo=buy-me-a-coffee)](https://www.buymeacoffee.com/eijex)
 
@@ -72,4 +73,3 @@ FactorForge CDS generates in-silico CDS design candidates and pre-synthesis revi
 - **Email** — eijex.lab@gmail.com
 - **FactorForge** — [factorforge.eijex.com](https://factorforge.eijex.com)
 - **Lab** — [www.eijex.com](https://www.eijex.com)
-
